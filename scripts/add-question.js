@@ -47,7 +47,7 @@ function createQuestionTemplate(level, tech, sublevel) {
 }
 
 function loadExistingQuestions(level, tech) {
-  const filePath = path.join(__dirname, '..', 'questions', level, `${tech}.json`);
+  const filePath = path.join(__dirname, '..', 'public', 'questions', level, `${tech}.json`);
   
   if (!fs.existsSync(filePath)) {
     return [];
@@ -63,7 +63,7 @@ function loadExistingQuestions(level, tech) {
 }
 
 function saveQuestions(level, tech, questions) {
-  const dirPath = path.join(__dirname, '..', 'questions', level);
+  const dirPath = path.join(__dirname, '..', 'public', 'questions', level);
   const filePath = path.join(dirPath, `${tech}.json`);
   
   // Create directory if it doesn't exist
@@ -79,7 +79,7 @@ function saveQuestions(level, tech, questions) {
 }
 
 function updateManifest(level, tech, sublevel) {
-  const manifestPath = path.join(__dirname, '..', 'questions', 'manifest.json');
+  const manifestPath = path.join(__dirname, '..', 'public', 'questions', 'manifest.json');
   
   try {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));

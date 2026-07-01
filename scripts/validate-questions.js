@@ -49,7 +49,8 @@ function validateQuestion(question) {
 }
 
 function loadQuestions(level, tech) {
-  const filePath = path.join(__dirname, '..', 'questions', level, `${tech}.json`);
+  const dirPath = path.join(__dirname, '..', 'public', 'questions', level);
+  const filePath = path.join(__dirname, '..', 'public', 'questions', level, `${tech}.json`);
   
   if (!fs.existsSync(filePath)) {
     return { questions: [], error: null };
