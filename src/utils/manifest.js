@@ -38,7 +38,7 @@ export async function loadAllQuestions(manifest) {
     
     for (const tech of techs) {
       try {
-        const response = await fetch(`/questions/${level}/${tech}.json`)
+        const response = await fetch(`${import.meta.env.BASE_URL}questions/${level}/${tech}.json`)
         const questions = await response.json()
         allQuestions[level][tech] = questions
       } catch (e) {

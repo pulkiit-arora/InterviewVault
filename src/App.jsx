@@ -25,7 +25,7 @@ export default function App(){
   },[dark])
 
   useEffect(()=>{
-    fetch('/questions/manifest.json')
+    fetch(`${import.meta.env.BASE_URL}questions/manifest.json`)
       .then(r=> r.json())
       .then(data=>{
         setManifest(data)
