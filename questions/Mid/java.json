@@ -1,0 +1,133 @@
+[
+  {
+    "id": "ja-mi-1",
+    "title": "AtomicInteger vs volatile",
+    "question": "What is the difference between `AtomicInteger` and `volatile` in Java? When would you use each?",
+    "answer": {
+      "summary": "volatile ensures visibility but not atomicity for compound operations, while AtomicInteger provides atomic operations for both read and write.",
+      "content": "Both `volatile` and `AtomicInteger` are used for thread-safe operations in Java, but they serve different purposes:\n\n### volatile\n- **Visibility**: Ensures that changes to a variable are immediately visible to other threads\n- **No atomicity**: Does not guarantee atomicity for compound operations (like increment)\n- **Use case**: Simple flags or status variables where only reads/writes are needed\n\n### AtomicInteger\n- **Atomicity**: Provides atomic operations like `getAndIncrement()`, `compareAndSet()`\n- **Visibility**: Also ensures visibility of changes\n- **Use case**: Counters, accumulators, or when you need compound atomic operations\n\n### Key Difference\n`volatile` only guarantees visibility of the latest write, but `i++` is not atomic (it's read-modify-write). `AtomicInteger` provides atomic versions of these operations using CAS (Compare-And-Swap).",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "volatile - Not thread-safe for increment",
+          "code": "public class VolatileCounter {\n    private volatile int count = 0;\n    \n    public void increment() {\n        count++; // NOT atomic! Race condition here\n    }\n    \n    public int getCount() {\n        return count;\n    }\n}\n\n// Problem: count++ is actually:\n// 1. Read count\n// 2. Increment\n// 3. Write count\n// Multiple threads can interleave these steps.",
+          "explanation": "Even with volatile, the increment operation is not atomic. Multiple threads calling increment() simultaneously can lose updates."
+        },
+        {
+          "language": "java",
+          "title": "AtomicInteger - Thread-safe for increment",
+          "code": "import java.util.concurrent.atomic.AtomicInteger;\n\npublic class AtomicCounter {\n    private AtomicInteger count = new AtomicInteger(0);\n    \n    public void increment() {\n        count.incrementAndGet(); // Atomic operation\n    }\n    \n    public int getCount() {\n        return count.get();\n    }\n}",
+          "explanation": "AtomicInteger provides atomic operations like incrementAndGet() which are thread-safe without synchronization."
+        },
+        {
+          "language": "java",
+          "title": "AtomicInteger - Compare and Set",
+          "code": "import java.util.concurrent.atomic.AtomicInteger;\n\npublic class AtomicExample {\n    private AtomicInteger value = new AtomicInteger(0);\n    \n    public boolean updateIfExpected(int expected, int newValue) {\n        // Atomically sets to newValue if current value == expected\n        return value.compareAndSet(expected, newValue);\n    }\n}",
+          "explanation": "compareAndSet() is the building block for lock-free algorithms. It atomically checks the current value and updates it only if it matches the expected value."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Java Concurrency in Practice - AtomicInteger",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html",
+          "type": "link"
+        },
+        {
+          "title": "Java volatile Keyword Guide",
+          "url": "https://www.baeldung.com/java-volatile",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": [
+      "concurrency",
+      "atomic",
+      "volatile",
+      "thread-safety"
+    ],
+    "sublevel": "Concurrency",
+    "years": 3,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "id": "ja-mi-3",
+    "title": "Java Version Features Overview",
+    "question": "What are the key features introduced in Java 8, 9, 11, 17, and 21? Which features would you consider most impactful for modern Java development?",
+    "answer": {
+      "summary": "Java 8 introduced lambdas and streams, Java 9 added modules, Java 11 added local variable syntax and HTTP client, Java 17 brought records and pattern matching, and Java 21 introduced virtual threads and string templates.",
+      "content": "Each major Java version introduced significant features that changed how we write Java code:\n\n### Java 8 (LTS - 2014)\n- **Lambda Expressions**: Functional programming capabilities\n- **Stream API**: Declarative data processing\n- **Optional**: Null-safe container type\n- **Default Methods**: Interface methods with implementations\n- **Date/Time API**: Modern date handling (java.time)\n\n### Java 9 (2017)\n- **Java Platform Module System (JPMS)**: Modular applications with strong encapsulation\n- **Private Interface Methods**: Helper methods in interfaces\n- **Factory Methods for Collections**: List.of(), Set.of(), Map.of()\n- **HTTP/2 Client**: Early version of modern HTTP client\n- **Process API**: Improved process handling\n\n### Java 11 (LTS - 2018)\n- **Local Variable Syntax (var)**: Type inference\n- **HTTP Client**: Standardized modern HTTP/2 support\n- **String Methods**: isBlank(), lines(), strip()\n- **Nest-Based Access Control**: Better encapsulation\n- **Run Single Files**: `java HelloWorld.java`\n\n### Java 17 (LTS - 2021)\n- **Records**: Immutable data classes\n- **Pattern Matching for instanceof**: Simplified type checking\n- **Sealed Classes**: Restricted inheritance\n- **Text Blocks**: Multi-line strings\n- **Switch Expressions**: Enhanced switch statements\n\n### Java 21 (LTS - 2023)\n- **Virtual Threads (Project Loom)**: Lightweight concurrency\n- **Pattern Matching for switch**: Deconstructing objects\n- **Record Patterns**: Pattern matching for records\n- **String Templates**: String interpolation\n- **Sequenced Collections**: Unified collection interfaces\n\n### Most Impactful Features\nFor modern development: **Lambdas/Streams** (Java 8), **Modules** (Java 9), **Records** (Java 17), and **Virtual Threads** (Java 21) are game-changers.",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Java 8 - Lambda and Stream",
+          "code": "List<String> names = List.of(\"Alice\", \"Bob\", \"Charlie\");\n\n// Before Java 8\nfor (String name : names) {\n    System.out.println(name.toUpperCase());\n}\n\n// Java 8+ with Stream API\nnames.stream()\n     .map(String::toUpperCase)\n     .forEach(System.out::println);\n\n// Filtering and collecting\nList<String> longNames = names.stream()\n    .filter(name -> name.length() > 4)\n    .collect(Collectors.toList());",
+          "explanation": "Lambdas and streams enable functional-style operations on collections, making code more concise and readable."
+        },
+        {
+          "language": "java",
+          "title": "Java 9 - Module System (module-info.java)",
+          "code": "// module-info.java - Define a module\nmodule com.myapp.core {\n    // Required dependencies\n    requires java.sql;\n    requires org.slf4j;\n    \n    // Export packages to other modules\n    exports com.myapp.core.service;\n    exports com.myapp.core.model;\n    \n    // Open packages for reflection\n    opens com.myapp.core.internal to hibernate.core;\n    \n    // Provide service implementations\n    provides com.myapp.api.DataService\n        with com.myapp.core.service.DataServiceImpl;\n}",
+          "explanation": "The module system (JPMS) provides strong encapsulation, reliable configuration, and explicit dependencies. modules are defined in module-info.java files."
+        },
+        {
+          "language": "java",
+          "title": "Java 9 - Factory Methods for Collections",
+          "code": "// Before Java 9 - verbose and mutable\nList<String> oldList = new ArrayList<>();\noldList.add(\"Alice\");\noldList.add(\"Bob\");\nCollections.unmodifiableList(oldList);\n\n// Java 9+ - concise and immutable\nList<String> names = List.of(\"Alice\", \"Bob\", \"Charlie\");\nSet<Integer> numbers = Set.of(1, 2, 3, 4);\nMap<String, Integer> ages = Map.of(\"Alice\", 30, \"Bob\", 25);\n\n// Nested immutable collections\nMap<String, List<String>> data = Map.of(\n    \"team1\", List.of(\"Alice\", \"Bob\"),\n    \"team2\", List.of(\"Charlie\", \"David\")\n);",
+          "explanation": "Factory methods create immutable collections in a concise way, reducing boilerplate and ensuring thread-safety by default."
+        },
+        {
+          "language": "java",
+          "title": "Java 9 - Private Interface Methods",
+          "code": "public interface DataProcessor {\n    void process(String data);\n    \n    // Default method\n    default void logProcessing(String data) {\n        System.out.println(\"Processing: \" + data);\n        validate(data);  // Call private helper\n    }\n    \n    // Private interface method (Java 9+)\n    private void validate(String data) {\n        if (data == null || data.isEmpty()) {\n            throw new IllegalArgumentException(\"Data cannot be empty\");\n        }\n    }\n    \n    // Another private method\n    private static String sanitize(String data) {\n        return data.trim().toLowerCase();\n    }\n}",
+          "explanation": "Private interface methods allow code reuse within interfaces without exposing implementation details to implementing classes."
+        },
+        {
+          "language": "java",
+          "title": "Java 11 - var and HTTP Client",
+          "code": "// Local variable type inference\nvar name = \"Alice\";\nvar numbers = List.of(1, 2, 3);\n\n// Modern HTTP Client (Java 11+)\nvar client = HttpClient.newHttpClient();\nvar request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.example.com/data\"))\n    .GET()\n    .build();\n\nHttpResponse<String> response = client.send(\n    request, \n    HttpResponse.BodyHandlers.ofString()\n);",
+          "explanation": "var reduces boilerplate, and the new HTTP Client provides a modern, fluent API for HTTP requests."
+        },
+        {
+          "language": "java",
+          "title": "Java 17 - Records",
+          "code": "// Traditional class (before Java 17)\nclass Person {\n    private final String name;\n    private final int age;\n    \n    public Person(String name, int age) {\n        this.name = name;\n        this.age = age;\n    }\n    \n    public String getName() { return name; }\n    public int getAge() { return age; }\n    \n    @Override\n    public boolean equals(Object o) { /* ... */ }\n    @Override\n    public int hashCode() { /* ... */ }\n    @Override\n    public String toString() { /* ... */ }\n}\n\n// Record (Java 17+)\nrecord Person(String name, int age) {}\n\n// Usage\nvar person = new Person(\"Alice\", 30);\nSystem.out.println(person.name()); // Alice\nSystem.out.println(person);       // Person[name=Alice, age=30]",
+          "explanation": "Records automatically generate constructor, getters, equals, hashCode, and toString - perfect for immutable data carriers."
+        },
+        {
+          "language": "java",
+          "title": "Java 21 - Virtual Threads",
+          "code": "// Traditional platform threads (expensive)\nExecutorService executor = Executors.newFixedThreadPool(100);\n\n// Virtual threads (lightweight, millions possible)\nExecutorService virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();\n\ntry {\n    // Create 1 million virtual threads\n    for (int i = 0; i < 1_000_000; i++) {\n        final int taskId = i;\n        virtualExecutor.submit(() -> {\n            Thread.sleep(Duration.ofSeconds(1));\n            System.out.println(\"Task \" + taskId + \" completed\");\n        });\n    }\n} finally {\n    virtualExecutor.close();\n}",
+          "explanation": "Virtual threads are lightweight threads managed by the JVM, enabling high-concurrency applications without thread pool complexity."
+        },
+        {
+          "language": "java",
+          "title": "Java 21 - Pattern Matching for switch",
+          "code": "// Before pattern matching\nObject obj = \"Hello\";\nif (obj instanceof String s) {\n    System.out.println(s.toUpperCase());\n}\n\n// Pattern matching for switch (Java 21+)\nString formatted = switch (obj) {\n    case String s -> s.toUpperCase();\n    case Integer i -> \"Number: \" + i;\n    case Double d -> String.format(\"%.2f\", d);\n    default -> \"Unknown type\";\n};",
+          "explanation": "Pattern matching in switch expressions allows type checking and extraction in a concise, readable way."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Oracle Java Release Notes",
+          "url": "https://www.oracle.com/java/technologies/javase/relnotes-index.html",
+          "type": "link"
+        },
+        {
+          "title": "Java 21 Features Guide",
+          "url": "https://openjdk.org/projects/jdk/21/",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["java-versions", "lambdas", "streams", "records", "virtual-threads"],
+    "sublevel": "Language Features",
+    "years": 5,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-01"
+  }
+]

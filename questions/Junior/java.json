@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ja-ju-1",
+    "title": "Reverse a Linked List",
+    "question": "How would you reverse a singly linked list? Explain both iterative and recursive approaches with their time and space complexity.",
+    "answer": {
+      "summary": "Reverse a linked list by changing the direction of pointers. Iterative approach uses O(1) space, recursive uses O(n) space due to call stack.",
+      "content": "Reversing a linked list is a classic interview question that tests your understanding of pointer manipulation and recursion.\n\n### Approach 1: Iterative\nUse three pointers to reverse the links one node at a time:\n- **prev**: Tracks the previous node (initially null)\n- **current**: The node being processed\n- **next**: Stores the next node before we change the link\n\n### Approach 2: Recursive\nRecursively reverse the rest of the list, then make the current node point to the previous node.\n\n### Complexity Comparison\n| Approach | Time | Space |\n|----------|------|-------|\n| Iterative | O(n) | O(1) |\n| Recursive | O(n) | O(n) |\n\n### Edge Cases to Consider\n- Empty list (null)\n- Single node list\n- Two node list\n- Large lists (stack overflow risk with recursion)",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Iterative Approach - O(n) time, O(1) space",
+          "code": "class ListNode {\n    int val;\n    ListNode next;\n    ListNode(int val) { this.val = val; }\n}\n\npublic ListNode reverseList(ListNode head) {\n    ListNode prev = null;\n    ListNode current = head;\n    \n    while (current != null) {\n        ListNode next = current.next;  // Save next node\n        current.next = prev;           // Reverse the link\n        prev = current;                // Move prev forward\n        current = next;                // Move current forward\n    }\n    \n    return prev;  // New head of reversed list\n}\n\n// Example usage:\n// Original: 1 -> 2 -> 3 -> null\n// After:    3 -> 2 -> 1 -> null",
+          "explanation": "The iterative approach is preferred in production because it uses constant space. We iterate through the list, reversing each link as we go."
+        },
+        {
+          "language": "java",
+          "title": "Recursive Approach - O(n) time, O(n) space",
+          "code": "public ListNode reverseListRecursive(ListNode head) {\n    // Base case: empty list or single node\n    if (head == null || head.next == null) {\n        return head;\n    }\n    \n    // Recursively reverse the rest of the list\n    ListNode newHead = reverseListRecursive(head.next);\n    \n    // Make the next node point back to current node\n    head.next.next = head;\n    \n    // Remove the old forward link\n    head.next = null;\n    \n    return newHead;  // Return the new head\n}\n\n// Example:\n// reverseListRecursive(1 -> 2 -> 3 -> null)\n// Step 1: Recurse to end, returns 3\n// Step 2: 3.next = 2 (was 2 -> 3, now 3 -> 2)\n// Step 3: 2.next = 1 (was 1 -> 2, now 2 -> 1)\n// Result: 3 -> 2 -> 1 -> null",
+          "explanation": "The recursive approach is elegant but uses O(n) space due to the call stack. It's good for understanding recursion but may cause stack overflow for very large lists."
+        },
+        {
+          "language": "java",
+          "title": "Complete Example with Test Cases",
+          "code": "public class LinkedListReversal {\n    \n    static class ListNode {\n        int val;\n        ListNode next;\n        ListNode(int val) { this.val = val; }\n    }\n    \n    // Iterative solution\n    public static ListNode reverse(ListNode head) {\n        ListNode prev = null;\n        ListNode current = head;\n        \n        while (current != null) {\n            ListNode next = current.next;\n            current.next = prev;\n            prev = current;\n            current = next;\n        }\n        \n        return prev;\n    }\n    \n    // Helper to print list\n    public static void printList(ListNode head) {\n        ListNode current = head;\n        while (current != null) {\n            System.out.print(current.val);\n            if (current.next != null) System.out.print(\" -> \");\n            current = current.next;\n        }\n        System.out.println(\" -> null\");\n    }\n    \n    public static void main(String[] args) {\n        // Test case 1: Normal list\n        ListNode head = new ListNode(1);\n        head.next = new ListNode(2);\n        head.next.next = new ListNode(3);\n        head.next.next.next = new ListNode(4);\n        \n        System.out.print(\"Original: \");\n        printList(head);\n        \n        ListNode reversed = reverse(head);\n        System.out.print(\"Reversed: \");\n        printList(reversed);\n        \n        // Test case 2: Empty list\n        ListNode empty = null;\n        System.out.println(\"Empty list reversed: \" + reverse(empty));\n        \n        // Test case 3: Single node\n        ListNode single = new ListNode(1);\n        System.out.print(\"Single node: \");\n        printList(reverse(single));\n    }\n}",
+          "explanation": "Complete working example with test cases for normal list, empty list, and single node list. This demonstrates proper handling of edge cases."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "LeetCode 206: Reverse Linked List",
+          "url": "https://leetcode.com/problems/reverse-linked-list/",
+          "type": "link"
+        },
+        {
+          "title": "GeeksforGeeks: Reverse a Linked List",
+          "url": "https://www.geeksforgeeks.org/reverse-a-linked-list/",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["linked-list", "data-structures", "algorithms", "pointers"],
+    "sublevel": "Data Structures",
+    "years": 1,
+    "difficulty": "Junior",
+    "lastUpdated": "2026-07-01"
+  }
+]

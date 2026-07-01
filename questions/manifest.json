@@ -1,0 +1,57 @@
+{
+  "levels": {
+    "Junior": {
+      "javascript": {
+        "Basics": [],
+        "DOM": [],
+        "Async": []
+      },
+      "python": {
+        "Basics": [],
+        "OOP": [],
+        "Exceptions": []
+      },
+      "java": {
+        "OOP": [],
+        "Collections": [],
+        "Multithreading": [],
+        "Data Structures": []
+      }
+    },
+    "Mid": {
+      "javascript": {
+        "Closures": [],
+        "Async Patterns": [],
+        "Design Patterns": []
+      },
+      "python": {
+        "Decorators": [],
+        "Generators": [],
+        "Context Managers": []
+      },
+      "java": {
+        "Advanced OOP": [],
+        "Streams": [],
+        "Concurrency": [],
+        "Language Features": []
+      }
+    },
+    "Senior": {
+      "javascript": {
+        "Event Loop": [],
+        "Memory Management": [],
+        "Performance": []
+      },
+      "python": {
+        "Metaclasses": [],
+        "Profiling": [],
+        "Optimization": []
+      },
+      "java": {
+        "JVM Internals": [],
+        "Reactive Programming": [],
+        "Distributed Systems": []
+      }
+    }
+  }
+}
