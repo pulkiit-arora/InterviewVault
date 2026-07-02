@@ -10,7 +10,7 @@ export default function SelectSublevels({ level, tech, manifest, onSelect, onBac
   useEffect(() => {
     if (!level || !tech) return
     setLoading(true)
-    fetch(`/questions/${level}/${tech}.json`)
+    fetch(`${import.meta.env.BASE_URL}questions/${level}/${tech}.json`)
       .then(r => r.json())
       .then(setQuestions)
       .catch(() => setQuestions([]))
