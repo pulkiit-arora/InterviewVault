@@ -1,0 +1,38 @@
+[
+  {
+    "id": "da-mi-1",
+    "title": "SQL Query Execution Order",
+    "question": "What are the components of a typical SQL query, and in what logical order does a database engine process them?",
+    "answer": {
+      "summary": "While a SQL query is written starting with SELECT, the database processes it in a different logical order, starting with FROM/JOIN, followed by WHERE, GROUP BY, HAVING, SELECT, ORDER BY, and finally LIMIT.",
+      "content": "A standard SQL query contains several clauses (SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY). However, the database engine executes these clauses in a very specific **Logical Processing Order** that differs from the written syntax.\n\n### Written Order vs. Execution Order\n\n**Written Order:**\n1. `SELECT`\n2. `FROM`\n3. `WHERE`\n4. `GROUP BY`\n5. `HAVING`\n6. `ORDER BY`\n7. `LIMIT / OFFSET`\n\n**Logical Execution Order:**\n\n1. **`FROM` and `JOINs`**: The database first identifies the base tables and joins them together. This step creates the initial working dataset.\n2. **`WHERE`**: Filters the rows based on the specified conditions. It eliminates data early in the process to reduce the workload for subsequent steps. (Note: You cannot use column aliases defined in `SELECT` here, because `SELECT` hasn't happened yet!).\n3. **`GROUP BY`**: Divides the remaining rows into groups based on matching values in specified columns.\n4. **`HAVING`**: Filters the grouped data. Unlike `WHERE` which filters individual rows, `HAVING` filters entire groups (often using aggregate functions like `SUM()` or `COUNT()`).\n5. **`SELECT`**: Finally, the database evaluates the expressions in the `SELECT` clause, processes aggregate functions, and creates column aliases.\n6. **`DISTINCT`**: If specified, removes duplicate rows from the remaining result set.\n7. **`ORDER BY`**: Sorts the final result set according to the specified columns. (Note: Because `SELECT` has already executed, you *can* use column aliases here).\n8. **`LIMIT / OFFSET`**: Discards rows to return only a specific subset or page of results.\n\n### Why does this matter?\nUnderstanding this order is crucial for debugging errors. For example, trying to use a column alias in the `WHERE` clause will result in an error because the alias isn't defined until step 5 (`SELECT`), but `WHERE` executes in step 2.",
+      "codeExamples": [
+        {
+          "language": "sql",
+          "title": "Example Query",
+          "code": "SELECT department_id, COUNT(employee_id) as total_employees\nFROM employees\nWHERE status = 'ACTIVE'\nGROUP BY department_id\nHAVING COUNT(employee_id) > 5\nORDER BY total_employees DESC\nLIMIT 10;",
+          "explanation": "1. FROM employees (gets table data)\n2. WHERE status = 'ACTIVE' (filters active employees)\n3. GROUP BY department_id (groups by department)\n4. HAVING COUNT(employee_id) > 5 (filters groups with <= 5 employees)\n5. SELECT department_id, COUNT... (computes aggregates, assigns alias 'total_employees')\n6. ORDER BY total_employees (sorts by the alias)\n7. LIMIT 10 (returns top 10 rows)"
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "SQL Logical Query Processing Phase",
+          "url": "https://docs.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": [
+      "sql",
+      "execution-order",
+      "query-processing",
+      "database-engine"
+    ],
+    "sublevel": "SQL Basics",
+    "years": 2,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-04"
+  }
+]

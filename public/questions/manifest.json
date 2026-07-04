@@ -24,6 +24,9 @@
         "Streams": [],
         "Concurrency": [],
         "Language Features": []
+      },
+      "database": {
+        "SQL Basics": []
       }
     },
     "Senior": {
