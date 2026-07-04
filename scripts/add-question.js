@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 const LEVELS = ['Junior', 'Mid', 'Senior'];
-const TECHS = ['javascript', 'python', 'java'];
+const TECHS = ['java', 'database'];
 
 function generateId(level, tech, index) {
   const techPrefix = tech.substring(0, 2).toLowerCase();
@@ -48,11 +48,11 @@ function createQuestionTemplate(level, tech, sublevel) {
 
 function loadExistingQuestions(level, tech) {
   const filePath = path.join(__dirname, '..', 'public', 'questions', level, `${tech}.json`);
-  
+
   if (!fs.existsSync(filePath)) {
     return [];
   }
-  
+
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(content);
@@ -65,40 +65,40 @@ function loadExistingQuestions(level, tech) {
 function saveQuestions(level, tech, questions) {
   const dirPath = path.join(__dirname, '..', 'public', 'questions', level);
   const filePath = path.join(dirPath, `${tech}.json`);
-  
+
   // Create directory if it doesn't exist
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
-  
+
   // Sort questions by ID
   const sorted = questions.sort((a, b) => a.id.localeCompare(b.id));
-  
+
   fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2), 'utf8');
   console.log(`✓ Saved ${questions.length} questions to ${filePath}`);
 }
 
 function updateManifest(level, tech, sublevel) {
   const manifestPath = path.join(__dirname, '..', 'public', 'questions', 'manifest.json');
-  
+
   try {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    
+
     // Ensure level exists
     if (!manifest.levels[level]) {
       manifest.levels[level] = {};
     }
-    
+
     // Ensure tech exists
     if (!manifest.levels[level][tech]) {
       manifest.levels[level][tech] = {};
     }
-    
+
     // Ensure sublevel exists
     if (!manifest.levels[level][tech][sublevel]) {
       manifest.levels[level][tech][sublevel] = [];
     }
-    
+
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
     console.log(`✓ Updated manifest with new sublevel: ${level}/${tech}/${sublevel}`);
   } catch (error) {
@@ -108,19 +108,19 @@ function updateManifest(level, tech, sublevel) {
 
 function getNextIndex(questions) {
   if (questions.length === 0) return 0;
-  
+
   // Extract indices from existing IDs (format: tech-level-number)
   const indices = questions.map(q => {
     const match = q.id.match(/-(\d+)$/);
     return match ? parseInt(match[1]) : 0;
   });
-  
+
   return Math.max(...indices) + 1;
 }
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.length < 3) {
     console.log('Usage: node scripts/add-question.js <level> <tech> <sublevel>');
     console.log('Example: node scripts/add-question.js Junior javascript "Async"');
@@ -128,37 +128,37 @@ function main() {
     console.log('Available techs:', TECHS.join(', '));
     process.exit(1);
   }
-  
+
   const [level, tech, sublevel] = args;
-  
+
   // Validate inputs
   if (!LEVELS.includes(level)) {
     console.error(`Invalid level: ${level}. Available: ${LEVELS.join(', ')}`);
     process.exit(1);
   }
-  
+
   if (!TECHS.includes(tech)) {
     console.error(`Invalid tech: ${tech}. Available: ${TECHS.join(', ')}`);
     process.exit(1);
   }
-  
+
   // Load existing questions
   const existingQuestions = loadExistingQuestions(level, tech);
   const nextIndex = getNextIndex(existingQuestions);
-  
+
   // Create new question
   const newQuestion = createQuestionTemplate(level, tech, sublevel);
   newQuestion.id = generateId(level, tech, nextIndex);
-  
+
   // Add to existing questions
   existingQuestions.push(newQuestion);
-  
+
   // Save
   saveQuestions(level, tech, existingQuestions);
-  
+
   // Update manifest to include new sublevel
   updateManifest(level, tech, sublevel);
-  
+
   console.log('\n✓ New question added successfully!');
   console.log(`  ID: ${newQuestion.id}`);
   console.log(`  Level: ${level}`);

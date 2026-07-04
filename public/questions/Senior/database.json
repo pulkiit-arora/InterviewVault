@@ -1,0 +1,39 @@
+[
+  {
+    "id": "da-se-1",
+    "title": "Database Partitioning Strategies",
+    "question": "What is database partitioning? Explain the differences between Horizontal and Vertical partitioning, and describe common horizontal partitioning strategies like Range, Hash, and List.",
+    "answer": {
+      "summary": "Database partitioning is the process of splitting a large table into smaller, more manageable pieces. The two main types are Vertical (splitting by columns) and Horizontal (splitting by rows). Common horizontal strategies include Range, Hash, and List partitioning.",
+      "content": "### What is Database Partitioning?\nPartitioning is a database design technique where very large tables are divided into multiple smaller, more manageable parts called partitions. Each partition can be managed and accessed independently, which significantly improves query performance, maintenance, and availability for large datasets.\n\n### Vertical vs. Horizontal Partitioning\n\n#### 1. Vertical Partitioning (Normalization-like)\nVertical partitioning splits a table by columns. You put some columns in one table and other columns in another, linked by a common key or primary key. \n- **Use case:** When a table has wide rows and some columns are accessed frequently (e.g., username, email) while others are accessed rarely (e.g., large text bio, BLOBs).\n\n#### 2. Horizontal Partitioning (Sharding)\nHorizontal partitioning divides a table by rows. Each partition has the exact same schema but holds different rows of data.\n- **Use case:** When a table has too many rows to fit on a single node or when queries become excessively slow due to table size.\n\n### Common Horizontal Partitioning Strategies\n\n- **Range Partitioning:** Data is partitioned based on a range of values. \n  - *Example:* Partitioning a `sales` table by date. Partition 1: Jan-Mar, Partition 2: Apr-Jun.\n- **List Partitioning:** Data is partitioned based on a predefined list of discrete values.\n  - *Example:* Partitioning a `users` table by country/region. Partition 1: US, Canada; Partition 2: UK, France.\n- **Hash Partitioning:** A hash algorithm is applied to a partition key to determine the partition. This ensures an even distribution of data.\n  - *Example:* Hashing on `user_id` across 4 partitions. Useful when data doesn't naturally fit into ranges or lists, and prevents 'hotspots'.\n- **Composite Partitioning:** Combining two or more partitioning methods (e.g., Range-Hash: first partition by date range, then hash by `user_id` within that range).\n\n### Benefits of Partitioning\n- **Performance:** Queries that filter on the partition key only scan the relevant partition (Partition Pruning).\n- **Manageability:** Operations like index rebuilds or backups can be performed at the partition level.\n- **Availability:** If one partition is offline or corrupted, the rest of the data remains accessible.",
+      "codeExamples": [
+        {
+          "language": "sql",
+          "title": "PostgreSQL Range Partitioning Example",
+          "code": "-- 1. Create the parent partitioned table\nCREATE TABLE measurement (\n    city_id         int not null,\n    logdate         date not null,\n    peaktemp        int,\n    unitsales       int\n) PARTITION BY RANGE (logdate);\n\n-- 2. Create the partitions\nCREATE TABLE measurement_y2023m01 PARTITION OF measurement\n    FOR VALUES FROM ('2023-01-01') TO ('2023-02-01');\n\nCREATE TABLE measurement_y2023m02 PARTITION OF measurement\n    FOR VALUES FROM ('2023-02-01') TO ('2023-03-01');\n\n-- 3. Inserting data automatically routes it to the correct partition\nINSERT INTO measurement (city_id, logdate, peaktemp, unitsales) \nVALUES (1, '2023-01-15', 45, 100);",
+          "explanation": "In PostgreSQL, you define the main table with `PARTITION BY RANGE` and then explicitly create child tables that define the boundaries. Inserts to the main table are routed to the appropriate child."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "PostgreSQL Table Partitioning",
+          "url": "https://www.postgresql.org/docs/current/ddl-partitioning.html",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": [
+      "database",
+      "partitioning",
+      "sharding",
+      "performance",
+      "sql"
+    ],
+    "sublevel": "Partitioning",
+    "years": 5,
+    "difficulty": "Senior",
+    "lastUpdated": "2026-07-02"
+  }
+]

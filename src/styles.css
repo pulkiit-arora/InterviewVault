@@ -688,6 +688,7 @@ select:hover{
   display:flex;
   gap:0.75rem;
   margin-top:1.25rem;
+  margin-bottom:1.5rem;
   flex-wrap:wrap
 }
 
@@ -1411,6 +1412,41 @@ body.dark-theme .home-hero h1{
 .question-content,
 .answer-content{
   line-height:1.7
+}
+
+/* Markdown Specific Styles */
+.question-content ul, .answer-content ul,
+.question-content ol, .answer-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.question-content ul, .answer-content ul {
+  list-style-type: disc;
+}
+
+.question-content ol, .answer-content ol {
+  list-style-type: decimal;
+}
+
+.question-content li, .answer-content li {
+  margin-bottom: 0.35rem;
+}
+
+.question-content h1, .question-content h2, .question-content h3, .question-content h4,
+.answer-content h1, .answer-content h2, .answer-content h3, .answer-content h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.question-content blockquote, .answer-content blockquote {
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-style: italic;
 }
 
 .markdown-paragraph{

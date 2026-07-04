@@ -124,10 +124,58 @@
         }
       ]
     },
-    "tags": ["java-versions", "lambdas", "streams", "records", "virtual-threads"],
+    "tags": [
+      "java-versions",
+      "lambdas",
+      "streams",
+      "records",
+      "virtual-threads"
+    ],
     "sublevel": "Language Features",
     "years": 5,
     "difficulty": "Mid",
     "lastUpdated": "2026-07-01"
+  },
+  {
+    "id": "ja-mi-5",
+    "title": "Functional Interfaces",
+    "question": "What are functional interfaces in Java? Provide examples of how to define them and explain some of the default functional interfaces provided by Java (like Predicate, Function, Consumer, Supplier).",
+    "answer": {
+      "summary": "A functional interface is an interface with exactly one abstract method, typically used with lambda expressions. Java 8 introduced many built-in functional interfaces in the java.util.function package.",
+      "content": "A **Functional Interface** in Java is an interface that contains exactly one abstract method. They were introduced in Java 8 to enable functional programming by providing target types for lambda expressions and method references.\n\n### Key Characteristics\n- Must have exactly **one abstract method**.\n- Can have any number of `default` or `static` methods.\n- Should optionally be annotated with `@FunctionalInterface`, which tells the compiler to verify that the interface meets the criteria.\n\n### Default Built-in Functional Interfaces\nJava provides a comprehensive set of functional interfaces in the `java.util.function` package to cover common scenarios:\n\n1. **`Predicate<T>`**: Represents a boolean-valued function of one argument. Commonly used for filtering or matching.\n2. **`Function<T, R>`**: Represents a function that accepts one argument of type `T` and produces a result of type `R`. Used for mapping and transforming data.\n3. **`Consumer<T>`**: Represents an operation that accepts a single input argument and returns no result (`void`). Used for performing side-effects (e.g., printing, modifying an object).\n4. **`Supplier<T>`**: Represents a supplier of results, taking no arguments and returning a value of type `T`. Used for deferred execution or factory methods.\n\nThere are also variations of these interfaces for primitive types (e.g., `IntPredicate`, `DoubleFunction`) to avoid boxing/unboxing overhead, and for multiple arguments (e.g., `BiFunction`, `BiPredicate`).",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Defining a Custom Functional Interface",
+          "code": "@FunctionalInterface\npublic interface MathOperation {\n    // Exactly one abstract method\n    int operate(int a, int b);\n    \n    // Can have default methods\n    default void printDescription() {\n        System.out.println(\"This is a math operation.\");\n    }\n}\n\n// Usage with lambda expression\nMathOperation addition = (a, b) -> a + b;\nMathOperation multiplication = (a, b) -> a * b;\n\nSystem.out.println(addition.operate(5, 3)); // Outputs: 8",
+          "explanation": "The @FunctionalInterface annotation enforces the single abstract method rule. We can easily implement this interface using lambda expressions."
+        },
+        {
+          "language": "java",
+          "title": "Using Built-in Functional Interfaces",
+          "code": "import java.util.function.*;\nimport java.util.List;\n\npublic class BuiltInInterfacesExample {\n    public static void main(String[] args) {\n        // 1. Predicate: T -> boolean\n        Predicate<String> isEmpty = str -> str.isEmpty();\n        System.out.println(isEmpty.test(\"\")); // true\n\n        // 2. Function: T -> R\n        Function<String, Integer> stringLength = str -> str.length();\n        System.out.println(stringLength.apply(\"Hello\")); // 5\n\n        // 3. Consumer: T -> void\n        Consumer<String> printer = str -> System.out.println(str);\n        printer.accept(\"Java 8 is great!\"); // Prints the string\n\n        // 4. Supplier: () -> T\n        Supplier<Double> randomValue = () -> Math.random();\n        System.out.println(randomValue.get()); // Random double\n\n        // Usage in Streams\n        List<String> names = List.of(\"Alice\", \"Bob\", \"Charlie\");\n        names.stream()\n             .filter(name -> name.startsWith(\"A\")) // Predicate\n             .map(String::toUpperCase) // Function\n             .forEach(System.out::println); // Consumer\n    }\n}",
+          "explanation": "This example demonstrates the usage of the four core built-in functional interfaces and how they seamlessly integrate with the Stream API."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Package java.util.function",
+          "url": "https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": [
+      "functional-interfaces",
+      "java-8",
+      "lambdas",
+      "util-function"
+    ],
+    "sublevel": "Language Features",
+    "years": 2,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-02"
   }
 ]
