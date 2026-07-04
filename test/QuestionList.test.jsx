@@ -4,7 +4,6 @@ import QuestionList from '../src/components/QuestionList'
 const manifest = {
   levels: {
     Junior: {
-      javascript: { Basics: [], Async: [] },
       java: { OOP: [], Collections: [], Multithreading: [] },
     },
     Mid: { database: { Partitioning: [] } },

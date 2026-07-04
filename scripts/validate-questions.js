@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 const LEVELS = ['Junior', 'Mid', 'Senior'];
-const TECHS = ['javascript', 'java', 'database'];
+const TECHS = ['java', 'database'];
 
 function validateQuestion(question) {
   const errors = [];

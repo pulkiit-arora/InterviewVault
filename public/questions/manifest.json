@@ -1,11 +1,6 @@
 {
   "levels": {
     "Junior": {
-      "javascript": {
-        "Basics": [],
-        "DOM": [],
-        "Async": []
-      },
       "java": {
         "OOP": [],
         "Collections": [],
@@ -14,11 +9,6 @@
       }
     },
     "Mid": {
-      "javascript": {
-        "Closures": [],
-        "Async Patterns": [],
-        "Design Patterns": []
-      },
       "java": {
         "Advanced OOP": [],
         "Streams": [],
@@ -30,11 +20,6 @@
       }
     },
     "Senior": {
-      "javascript": {
-        "Event Loop": [],
-        "Memory Management": [],
-        "Performance": []
-      },
       "java": {
         "JVM Internals": [],
         "Reactive Programming": [],

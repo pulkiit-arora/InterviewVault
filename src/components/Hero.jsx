@@ -46,7 +46,7 @@ export default function Hero({ manifest }){
     <section className="hero-section">
       <div className="hero-content">
         <h1>InterviewVault</h1>
-        <p>Master your next interview with curated questions and detailed answers across junior, mid, and senior levels. Covering Java, JavaScript, and Databases.</p>
+        <p>Master your next interview with curated questions and detailed answers across junior, mid, and senior levels. Covering Java and Databases.</p>
         <div className="hero-stats">
           <div className="stat">
             <span className="stat-num">{loading ? '…' : stats.totalQuestions}</span>
