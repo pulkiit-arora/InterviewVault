@@ -7,7 +7,7 @@ const manifest = {
       javascript: { Basics: [], Async: [] },
       java: { OOP: [], Collections: [], Multithreading: [] },
     },
-    Mid: { python: { Decorators: [], Generators: [] } },
+    Mid: { database: { Partitioning: [] } },
   },
 }
 

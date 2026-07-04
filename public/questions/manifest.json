@@ -6,11 +6,6 @@
         "DOM": [],
         "Async": []
       },
-      "python": {
-        "Basics": [],
-        "OOP": [],
-        "Exceptions": []
-      },
       "java": {
         "OOP": [],
         "Collections": [],
@@ -24,11 +19,6 @@
         "Async Patterns": [],
         "Design Patterns": []
       },
-      "python": {
-        "Decorators": [],
-        "Generators": [],
-        "Context Managers": []
-      },
       "java": {
         "Advanced OOP": [],
         "Streams": [],
@@ -41,11 +31,6 @@
         "Event Loop": [],
         "Memory Management": [],
         "Performance": []
-      },
-      "python": {
-        "Metaclasses": [],
-        "Profiling": [],
-        "Optimization": []
       },
       "java": {
         "JVM Internals": [],
