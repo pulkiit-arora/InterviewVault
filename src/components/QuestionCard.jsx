@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { formatQuestionForDisplay } from '../utils/questionHelpers'
 
-export default function QuestionCard({ q }) {
+export default React.memo(function QuestionCard({ q }) {
+  const [isOpen, setIsOpen] = useState(false)
   const normalized = formatQuestionForDisplay(q)
   const isNewSchema = typeof q.answer === 'object'
 
@@ -46,11 +47,12 @@ export default function QuestionCard({ q }) {
         </ReactMarkdown>
       </div>
 
-      <details>
+      <details onToggle={(e) => setIsOpen(e.target.open)}>
         <summary>Answer</summary>
-        <div className="answer-content">
-          {isNewSchema ? (
-            <>
+        {isOpen && (
+          <div className="answer-content">
+            {isNewSchema ? (
+              <>
               {normalized.answer.summary && (
                 <p className="answer-summary">{normalized.answer.summary}</p>
               )}
@@ -157,8 +159,9 @@ export default function QuestionCard({ q }) {
           ) : (
             <pre className="legacy-answer">{q.answer}</pre>
           )}
-        </div>
+          </div>
+        )}
       </details>
     </article>
   )
-}
+})
