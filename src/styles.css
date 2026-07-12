@@ -1733,90 +1733,79 @@ body.dark-theme .home-hero h1{
   line-height: 1.3;
 }
 
-/* ── Guide TOC (hierarchical heading nav) ────────── */
+/* ── Guide Chapters Nav ──────────────────────────── */
 .guides-toc-divider {
   height: 1px;
   background: var(--border);
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
 }
 
-.guide-toc {
-  padding: 0.5rem;
+.guide-chapters-nav {
+  padding: 0.5rem 0.75rem 1rem;
 }
 
-.guide-toc-list {
+.guide-chapters-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.guide-toc-h2-item {
-  margin-bottom: 0.1rem;
+.guide-chapter-item {
+  margin-bottom: 0.5rem;
 }
 
-.guide-toc-btn {
+.guide-chapter-btn {
   width: 100%;
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: none;
-  border-radius: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.6rem 0.85rem;
   background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   font-family: inherit;
-  line-height: 1.4;
+  border-radius: 0 6px 6px 0;
 }
 
-.guide-toc-h2 {
-  padding: 0.4rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.guide-toc-h2:hover {
+.guide-chapter-btn:hover {
   background: var(--accent);
-  color: var(--primary);
+  border-left-color: var(--border);
 }
 
-.guide-toc-h2.toc-active {
-  color: var(--primary);
+.guide-chapter-btn.active {
   background: var(--accent);
+  border-left-color: var(--primary);
 }
 
-.guide-toc-sub {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 0.2rem 0;
-}
-
-.guide-toc-h3 {
-  padding: 0.28rem 0.75rem 0.28rem 1.5rem;
-  font-size: 0.75rem;
-  font-weight: 400;
+.guide-chapter-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--muted);
+  margin-bottom: 0.15rem;
+  transition: color 0.2s ease;
 }
 
-.guide-toc-h3:hover {
+.guide-chapter-btn:hover .guide-chapter-label,
+.guide-chapter-btn.active .guide-chapter-label {
   color: var(--primary);
-  background: var(--accent);
 }
 
-.guide-toc-h3.toc-active {
-  color: var(--primary);
+.guide-chapter-title {
+  display: block;
+  font-size: 0.8rem;
   font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
 }
 
-.toc-h3-dot {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-  opacity: 0.5;
+.guide-chapter-btn.active .guide-chapter-title {
+  font-weight: 600;
 }
 
 /* ── Guide Content Area ──────────────────────────── */
@@ -1992,6 +1981,85 @@ body.dark-theme .home-hero h1{
 .guide-markdown strong { font-weight: 700; color: var(--text); }
 .guide-markdown em { font-style: italic; }
 
+/* ── Chapters Card Grid (In-page TOC) ────────────── */
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.chapter-card {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chapter-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.chapter-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.chapter-name {
+  margin: 0 0 0.85rem 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 700;
+  line-height: 1.3;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+.chapter-name a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.chapter-name a:hover {
+  color: var(--primary-700);
+}
+
+.chapter-topics {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.chapter-topics li {
+  margin-bottom: 0 !important;
+}
+
+.chapter-topics li a {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.chapter-topics li a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 /* ── Responsive ──────────────────────────────────── */
 @media(max-width: 768px) {
   .guides-layout {
@@ -2002,5 +2070,8 @@ body.dark-theme .home-hero h1{
   }
   .guides-content {
     padding: 1.5rem;
+  }
+  .chapters-grid {
+    grid-template-columns: 1fr;
   }
 }

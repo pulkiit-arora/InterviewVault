@@ -20,8 +20,6 @@ renderer.heading = function ({ text, depth }) {
 }
 marked.use({ renderer, breaks: true, gfm: true })
 
-
-
 export default function GuideViewer({ basePath }) {
   const [guides, setGuides]           = useState([])
   const [activeGuide, setActiveGuide] = useState(null)

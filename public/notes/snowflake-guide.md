@@ -7,42 +7,92 @@
 
 ## 📚 Chapters
 
-- **[Chapter 1: Architecture & Core Concepts](#chapter-1-architecture-core-concepts)**
-  - [1.1 What is Snowflake?](#11-what-is-snowflake)
-  - [1.2 Three-Layer Architecture](#12-three-layer-architecture)
-  - [1.3 Columnar Storage & Micro-partitions](#13-columnar-storage-micro-partitions)
-  - [1.4 Caching](#14-caching)
-  - [1.5 Virtual Warehouses](#15-virtual-warehouses)
-  - [1.6 Query Execution Flow](#16-query-execution-flow)
-- **[Chapter 2: Enterprise Data Modeling](#chapter-2-enterprise-data-modeling)**
-  - [2.1 OLTP vs OLAP](#21-oltp-vs-olap)
-  - [2.2 Data Modeling — Star & Snowflake Schema](#22-data-modeling-star-snowflake-schema)
-  - [2.3 Fact vs Dimension](#23-fact-vs-dimension)
-  - [2.4 Constraints, Views & Dynamic Tables](#24-constraints-views-dynamic-tables)
-- **[Chapter 3: Semi-Structured Data & Ingestion](#chapter-3-semi-structured-data-ingestion)**
-  - [3.1 Semi-Structured Data — VARIANT](#31-semi-structured-data-variant)
-  - [3.2 JSON Functions](#32-json-functions)
-  - [3.3 Stages & COPY INTO](#33-stages-copy-into)
-  - [3.4 Advanced COPY INTO & Ingestion Metadata](#34-advanced-copy-into-ingestion-metadata)
-- **[Chapter 4: Enterprise Data Ingestion Pipelines](#chapter-4-enterprise-data-ingestion-pipelines)**
-  - [4.1 Multi-Layer Pipeline Architecture](#41-multi-layer-pipeline-architecture)
-  - [4.2 Data Validation & Error Logging](#42-data-validation-error-logging)
-  - [4.3 Incremental Loading & MERGE (UPSERT)](#43-incremental-loading-merge-upsert)
-  - [4.4 RAW vs CURATED Design (Lineage & Replay)](#44-raw-vs-curated-design-lineage-replay)
-  - [4.5 Pipeline Best Practices & AI Readiness](#45-pipeline-best-practices-ai-readiness)
-- **[Chapter 5: Change Data Capture (CDC) with Streams & Tasks](#chapter-5-change-data-capture-cdc-with-streams--tasks)**
-  - [5.1 Change Data Capture (CDC) Basics](#51-change-data-capture-cdc-basics)
-  - [5.2 Snowflake Streams & Change Tracking](#52-snowflake-streams--change-tracking)
-  - [5.3 Snowflake Tasks & Orchestration](#53-snowflake-tasks--orchestration)
-  - [5.4 Automated CDC Pipeline Architecture](#54-automated-cdc-pipeline-architecture)
-- **[Chapter 6: Data Protection & Recovery (Time Travel & Cloning)](#chapter-6-data-protection--recovery-time-travel--cloning)**
-  - [6.1 Time Travel & Storage Internals](#61-time-travel--storage-internals)
-  - [6.2 Time Travel vs Fail-safe vs Streams](#62-time-travel-vs-fail-safe-vs-streams)
-  - [6.3 Zero-Copy Cloning & Internals](#63-zero-copy-cloning--internals)
-  - [6.4 Cloning Levels, Methods & Combinations](#64-cloning-levels-methods--combinations)
-- **[Chapter 7: Practice & Interview Prep](#chapter-7-practice--interview-prep)**
-  - [7.1 Key Interview Questions](#71-key-interview-questions)
-  - [7.2 Quick Tips & Gotchas](#72-quick-tips-gotchas)
+<div class="chapters-grid">
+  <!-- Chapter 1 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 1</div>
+    <h3 class="chapter-name"><a href="#chapter-1-architecture-core-concepts">Architecture & Core Concepts</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#11-what-is-snowflake">1.1 What is Snowflake?</a></li>
+      <li><a href="#12-three-layer-architecture">1.2 Three-Layer Architecture</a></li>
+      <li><a href="#13-columnar-storage-micro-partitions">1.3 Columnar Storage & Micro-partitions</a></li>
+      <li><a href="#14-caching">1.4 Caching</a></li>
+      <li><a href="#15-virtual-warehouses">1.5 Virtual Warehouses</a></li>
+      <li><a href="#16-query-execution-flow">1.6 Query Execution Flow</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 2 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 2</div>
+    <h3 class="chapter-name"><a href="#chapter-2-enterprise-data-modeling">Enterprise Data Modeling</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#21-oltp-vs-olap">2.1 OLTP vs OLAP</a></li>
+      <li><a href="#22-data-modeling-star-snowflake-schema">2.2 Star & Snowflake Schema</a></li>
+      <li><a href="#23-fact-vs-dimension">2.3 Fact vs Dimension</a></li>
+      <li><a href="#24-constraints-views-dynamic-tables">2.4 Constraints, Views & Dynamic Tables</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 3 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 3</div>
+    <h3 class="chapter-name"><a href="#chapter-3-semi-structured-data-ingestion">Semi-Structured Data & Ingestion</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#31-semi-structured-data-variant">3.1 Semi-Structured Data — VARIANT</a></li>
+      <li><a href="#32-json-functions">3.2 JSON Functions</a></li>
+      <li><a href="#33-stages-copy-into">3.3 Stages & COPY INTO</a></li>
+      <li><a href="#34-advanced-copy-into-ingestion-metadata">3.4 Advanced Ingestion Settings</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 4 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 4</div>
+    <h3 class="chapter-name"><a href="#chapter-4-enterprise-data-ingestion-pipelines">Enterprise Ingestion Pipelines</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#41-multi-layer-pipeline-architecture">4.1 Pipeline Layers (RAW to REPORTING)</a></li>
+      <li><a href="#42-data-validation-error-logging">4.2 Data Validation & Error Logging</a></li>
+      <li><a href="#43-incremental-loading-merge-upsert">4.3 Incremental Loading & MERGE</a></li>
+      <li><a href="#44-raw-vs-curated-design-lineage-replay">4.4 RAW vs CURATED Architecture</a></li>
+      <li><a href="#45-pipeline-best-practices-ai-readiness">4.5 Best Practices & AI Readiness</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 5 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 5</div>
+    <h3 class="chapter-name"><a href="#chapter-5-change-data-capture-cdc-with-streams--tasks">Change Data Capture (CDC)</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#51-change-data-capture-cdc-basics">5.1 CDC Basics & java analogy</a></li>
+      <li><a href="#52-snowflake-streams-change-tracking">5.2 Streams & Change Logging</a></li>
+      <li><a href="#53-snowflake-tasks-orchestration">5.3 Tasks & Scheduled SQL</a></li>
+      <li><a href="#54-automated-cdc-pipeline-architecture">5.4 Automated Pipeline setup</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 6 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 6</div>
+    <h3 class="chapter-name"><a href="#chapter-6-data-protection--recovery-time-travel--cloning">Data Recovery & Cloning</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#61-time-travel-storage-internals">6.1 Time Travel & Storage layer</a></li>
+      <li><a href="#62-time-travel-vs-fail-safe-vs-streams">6.2 Time Travel vs Fail-safe</a></li>
+      <li><a href="#63-zero-copy-cloning-internals">6.3 Zero-Copy Cloning internals</a></li>
+      <li><a href="#64-cloning-levels-methods-combinations">6.4 Cloning Levels, CTAS & backups</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 7 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 7</div>
+    <h3 class="chapter-name"><a href="#chapter-7-practice-interview-prep">Practice & Interview Prep</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#71-key-interview-questions">7.1 Key Interview Questions</a></li>
+      <li><a href="#72-quick-tips-gotchas">7.2 Ingestion Tips & Gotchas</a></li>
+    </ul>
+  </div>
+</div>
 
 ---
 
