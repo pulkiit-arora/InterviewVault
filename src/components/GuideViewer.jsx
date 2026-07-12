@@ -44,7 +44,6 @@ export default function GuideViewer({ basePath }) {
     if (!activeGuide) return
     setLoading(true)
     setMarkdown('')
-    setActiveHeading(null)
     fetch(`${basePath}notes/${activeGuide.file}`)
       .then(r => r.text())
       .then(text => {
