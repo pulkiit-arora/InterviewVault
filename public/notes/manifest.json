@@ -1,0 +1,10 @@
+{
+  "guides": [
+    {
+      "id": "snowflake",
+      "title": "❄️ Snowflake",
+      "subtitle": "Architecture, Modeling & Semi-Structured Data",
+      "file": "snowflake-guide.md"
+    }
+  ]
+}

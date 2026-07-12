@@ -6,6 +6,7 @@ import SelectionPrompt from './components/SelectionPrompt'
 import SelectSublevels from './components/SelectSublevels'
 import HomeDetails from './components/HomeDetails'
 import Footer from './components/Footer'
+import GuideViewer from './components/GuideViewer'
 
 export default function App(){
   const [manifest, setManifest] = useState(null)
@@ -13,6 +14,7 @@ export default function App(){
   const [level, setLevel] = useState(null)
   const [tech, setTech] = useState(null)
   const [sublevel, setSublevel] = useState(null)
+  const [view, setView] = useState(null) // null = home, 'guides' = guide viewer
   const [dark, setDark] = useState(()=>{
     try{ return localStorage.getItem('iv-theme') === 'dark' }catch(e){return false}
   })
@@ -41,6 +43,7 @@ export default function App(){
     setLevel(selectedLevel)
     setTech(selectedTech)
     setSublevel(null)
+    setView(null)
   }
   
   const handleSublevelSelection = (selectedSublevel) => {
@@ -48,6 +51,7 @@ export default function App(){
   }
   
   const handleReset = (resetTo = null) => {
+    setView(null)
     if(resetTo === 'tech') {
       setTech(null)
       setSublevel(null)
@@ -58,12 +62,21 @@ export default function App(){
     }
   }
 
+  const handleOpenGuides = () => {
+    setView('guides')
+    setLevel(null)
+    setTech(null)
+    setSublevel(null)
+  }
+
   return (
     <div className="app">
-      <Header appName="InterviewVault" levels={Object.keys(manifest.levels)} level={level} tech={tech} sublevel={sublevel} setLevel={setLevel} setTech={setTech} setSublevel={setSublevel} toggleTheme={toggleTheme} manifest={manifest} onReset={() => handleReset()} />
-      {!level || !tech ? <Hero manifest={manifest} /> : null}
+      <Header appName="InterviewVault" levels={Object.keys(manifest.levels)} level={level} tech={tech} sublevel={sublevel} setLevel={setLevel} setTech={setTech} setSublevel={setSublevel} toggleTheme={toggleTheme} manifest={manifest} onReset={() => handleReset()} onOpenGuides={handleOpenGuides} view={view} />
+      {!level && !tech && view !== 'guides' ? <Hero manifest={manifest} /> : null}
       <main>
-        {!level || !tech ? (
+        {view === 'guides' ? (
+          <GuideViewer basePath={import.meta.env.BASE_URL} />
+        ) : !level || !tech ? (
           <HomeDetails manifest={manifest} onSelect={handleTechSelection} />
         ) : !sublevel ? (
           <SelectSublevels level={level} tech={tech} manifest={manifest} onSelect={handleSublevelSelection} onBack={() => handleReset('tech')} />

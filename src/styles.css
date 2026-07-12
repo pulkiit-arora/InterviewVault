@@ -1617,3 +1617,304 @@ body.dark-theme .home-hero h1{
   color:var(--primary-700);
   text-decoration:underline
 }
+
+/* ── Guides Nav Button ───────────────────────────── */
+.guides-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-left: 0.75rem;
+}
+
+.guides-nav-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--accent);
+}
+
+.guides-nav-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ── Guides Layout ───────────────────────────────── */
+.guides-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2rem;
+  align-items: start;
+  padding-bottom: 4rem;
+  min-height: 70vh;
+}
+
+/* ── Guides Sidebar ──────────────────────────────── */
+.guides-sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.guides-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--accent);
+}
+
+.guides-sidebar-icon { font-size: 1rem; }
+
+.guides-sidebar-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.guides-list {
+  list-style: none;
+  padding: 0.5rem;
+}
+
+.guide-item-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.guide-item-btn:hover {
+  background: var(--accent);
+}
+
+.guide-item-btn.active {
+  background: var(--primary);
+}
+
+.guide-item-btn.active .guide-item-title,
+.guide-item-btn.active .guide-item-sub {
+  color: #fff;
+}
+
+.guide-item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.guide-item-sub {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+/* ── Guide Content Area ──────────────────────────── */
+.guides-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 2.5rem 3rem;
+  min-height: 60vh;
+}
+
+/* ── Guide Loading ───────────────────────────────── */
+.guide-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 40vh;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.guide-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.guide-error {
+  padding: 2rem;
+  color: #e53e3e;
+  font-size: 0.9rem;
+}
+
+/* ── Markdown Rendering ──────────────────────────── */
+.guide-markdown {
+  line-height: 1.8;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.guide-markdown h1 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.guide-markdown h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-markdown h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.guide-markdown p {
+  margin-bottom: 0.9rem;
+}
+
+.guide-markdown ul,
+.guide-markdown ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.guide-markdown li {
+  margin-bottom: 0.3rem;
+}
+
+.guide-markdown code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82em;
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  color: var(--primary);
+}
+
+.guide-markdown pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.guide-markdown pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.guide-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0 1.75rem;
+  font-size: 0.88rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.guide-markdown thead {
+  background: var(--accent);
+}
+
+.guide-markdown th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+}
+
+.guide-markdown td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.guide-markdown tr:last-child td {
+  border-bottom: none;
+}
+
+.guide-markdown tr:hover td {
+  background: var(--accent);
+}
+
+.guide-markdown blockquote {
+  border-left: 3px solid var(--primary);
+  margin: 1rem 0;
+  padding: 0.6rem 1.2rem;
+  background: var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.guide-markdown blockquote p { margin: 0; }
+
+.guide-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.guide-markdown strong { font-weight: 700; color: var(--text); }
+.guide-markdown em { font-style: italic; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media(max-width: 768px) {
+  .guides-layout {
+    grid-template-columns: 1fr;
+  }
+  .guides-sidebar {
+    position: static;
+  }
+  .guides-content {
+    padding: 1.5rem;
+  }
+}
