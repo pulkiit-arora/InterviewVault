@@ -30,9 +30,19 @@
   - [4.3 Incremental Loading & MERGE (UPSERT)](#43-incremental-loading-merge-upsert)
   - [4.4 RAW vs CURATED Design (Lineage & Replay)](#44-raw-vs-curated-design-lineage-replay)
   - [4.5 Pipeline Best Practices & AI Readiness](#45-pipeline-best-practices-ai-readiness)
-- **[Chapter 5: Practice & Interview Prep](#chapter-5-practice-interview-prep)**
-  - [5.1 Key Interview Questions](#51-key-interview-questions)
-  - [5.2 Quick Tips & Gotchas](#52-quick-tips-gotchas)
+- **[Chapter 5: Change Data Capture (CDC) with Streams & Tasks](#chapter-5-change-data-capture-cdc-with-streams--tasks)**
+  - [5.1 Change Data Capture (CDC) Basics](#51-change-data-capture-cdc-basics)
+  - [5.2 Snowflake Streams & Change Tracking](#52-snowflake-streams--change-tracking)
+  - [5.3 Snowflake Tasks & Orchestration](#53-snowflake-tasks--orchestration)
+  - [5.4 Automated CDC Pipeline Architecture](#54-automated-cdc-pipeline-architecture)
+- **[Chapter 6: Data Protection & Recovery (Time Travel & Cloning)](#chapter-6-data-protection--recovery-time-travel--cloning)**
+  - [6.1 Time Travel & Storage Internals](#61-time-travel--storage-internals)
+  - [6.2 Time Travel vs Fail-safe vs Streams](#62-time-travel-vs-fail-safe-vs-streams)
+  - [6.3 Zero-Copy Cloning & Internals](#63-zero-copy-cloning--internals)
+  - [6.4 Cloning Levels, Methods & Combinations](#64-cloning-levels-methods--combinations)
+- **[Chapter 7: Practice & Interview Prep](#chapter-7-practice--interview-prep)**
+  - [7.1 Key Interview Questions](#71-key-interview-questions)
+  - [7.2 Quick Tips & Gotchas](#72-quick-tips-gotchas)
 
 ---
 
@@ -144,7 +154,7 @@ REPORTING      → Client-facing views / pre-aggregated tables
 ### 2.3 Fact vs Dimension
 
 - **Dimension Tables:** Contextual data representing "Who, What, Where, When". Slow-moving. (e.g., `Employee`, `Date`, `Product`).
-- **Fact Tables:** Measurable quantitative events. Append-heavy. (e.g., `Payroll`, `Sales_Amount`, `Units_Sold`).
+- **Fact Tables:** Quantitative measurable events. Append-heavy. (e.g., `Payroll`, `Sales_Amount`, `Units_Sold`).
 
 ---
 
@@ -176,7 +186,7 @@ REPORTING      → Client-facing views / pre-aggregated tables
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `PARSE_JSON(str)` | Converts string representation of JSON to VARIANT | `PARSE_JSON('{"id": 1}')` |
+| `PARSE_JSON(str)` | Converts string JSON to VARIANT | `PARSE_JSON('{"id": 1}')` |
 | `OBJECT_CONSTRUCT(k,v)` | Dynamically builds a JSON object | `OBJECT_CONSTRUCT('name', 'John')` |
 | `ARRAY_CONSTRUCT(v1,v2)` | Dynamically builds a JSON array | `ARRAY_CONSTRUCT('Java', 'SQL')` |
 | `ARRAY_AGG(col)` | Aggregates column values into a single JSON array | `SELECT ARRAY_AGG(salary) FROM ...` |
@@ -307,9 +317,178 @@ WHEN NOT MATCHED THEN
 
 ---
 
-## Chapter 5: Practice & Interview Prep
+## Chapter 5: Change Data Capture (CDC) with Streams & Tasks
 
-### 5.1 Key Interview Questions
+### 5.1 Change Data Capture (CDC) Basics
+
+- **What is CDC?** A design pattern that detects and captures modifications (inserts, updates, deletes) in a source table and delivers them downstream.
+- **Why CDC is needed:** Traditional batch loads require full table scans and full table rewrites (Full Load). CDC enables **Incremental Load**, scanning and copying only the modified rows, which reduces processing time and warehouse cost.
+- **Java Analogy:** Like an Event Listener / Observer pattern. Instead of a thread running a loop to check the state of an entire Object List (polling), the class triggers an event callback whenever a property changes.
+
+---
+
+### 5.2 Snowflake Streams & Change Tracking
+
+A **Stream** is a lightweight schema object that tracks DML changes (inserts, updates, deletes) made to a source table.
+- **How Streams Work Internally:** A Stream does not duplicate or store target table data. Instead, it acts as a pointer storing a transaction position bookmark. It uses **metadata-based change tracking** to compute the difference between the source table's current version and the bookmark's version.
+- **DML Logging Columns:** Every stream appends three metadata columns to the query output:
+
+| Metadata Column | Datatype | Purpose / Represents |
+|-----------------|----------|----------------------|
+| `METADATA$ACTION` | `VARCHAR` | The DML action type: `INSERT` or `DELETE`. |
+| `METADATA$ISUPDATE` | `BOOLEAN` | `TRUE` if the row change was caused by an `UPDATE` statement; otherwise `FALSE`. |
+| `METADATA$ROW_ID` | `VARCHAR` | A unique, stable ID for the row, used to track changes to the same row over time. |
+
+- **Why UPDATE appears as DELETE + INSERT:** Because Snowflake micro-partitions are immutable, an update physically deletes the old version of the row (logs `DELETE`, `METADATA$ISUPDATE = TRUE`) and inserts the new version of the row (logs `INSERT`, `METADATA$ISUPDATE = TRUE`).
+
+**Consuming a Stream:**
+Reading from a stream returns only the delta records. Once those records are consumed in a DML transaction (like an `INSERT INTO ... SELECT FROM stream` or `MERGE`), the stream bookmark automatically advances to the end of that transaction.
+```sql
+CREATE OR REPLACE STREAM employee_stream ON TABLE raw_employee;
+
+-- Query changes
+SELECT * FROM employee_stream;
+```
+
+---
+
+### 5.3 Snowflake Tasks & Orchestration
+
+A **Task** is a scheduling object used to execute a single SQL statement, `MERGE`, or Stored Procedure.
+
+- **Lifecycle states:** Tasks are created in a `SUSPENDED` state by default. They **must be explicitly resumed** to run.
+  ```sql
+  -- Resume Task
+  ALTER TASK my_cdc_task RESUME;
+  -- Suspend Task
+  ALTER TASK my_cdc_task SUSPEND;
+  ```
+- **Compute Requirements:** A task requires an active Virtual Warehouse to run its SQL statements.
+- **Serverless Tasks:** You can omit the `WAREHOUSE` parameter to run the task using Snowflake-managed compute resources. Snowflake automatically scales compute up/down and bills you per-second for serverless execution.
+- **Monitoring Tasks:** Use the `TASK_HISTORY()` table function to audit execution status, timings, and error logs.
+  ```sql
+  SELECT * FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(TASK_NAME => 'MY_CDC_TASK'));
+  ```
+
+---
+
+### 5.4 Automated CDC Pipeline Architecture
+
+By combining **Streams** (change capture) and **Tasks** (scheduled orchestration), you can build an automated, low-latency, end-to-end ingestion pipeline:
+
+```
+Master Table
+     │
+     ▼ (DML Changes occur)
+Stream (Tracks changes dynamically)
+     │
+     ▼ (Triggers Task checking logic)
+Task (Runs scheduled MERGE only when stream contains data)
+     │
+     ▼
+Reporting / Curated Tables (Aggregated BI / Cortex AI ready views)
+```
+
+**Task with Stream Consumption Example:**
+```sql
+CREATE OR REPLACE TASK merge_employee_task
+  WAREHOUSE = my_wh
+  SCHEDULE = '5 minute'
+  WHEN SYSTEM$STREAM_HAS_DATA('employee_stream')
+AS
+  MERGE INTO clean_employee TARGET
+  USING employee_stream SOURCE
+  ON TARGET.employee_id = SOURCE.employee_id
+  WHEN MATCHED AND SOURCE.METADATA$ACTION = 'DELETE' THEN
+    DELETE
+  WHEN MATCHED AND SOURCE.METADATA$ISUPDATE = TRUE THEN
+    UPDATE SET TARGET.name = SOURCE.name, TARGET.salary = SOURCE.salary
+  WHEN NOT MATCHED AND SOURCE.METADATA$ACTION = 'INSERT' THEN
+    INSERT (employee_id, name, salary) VALUES (SOURCE.employee_id, SOURCE.name, SOURCE.salary);
+```
+
+---
+
+## Chapter 6: Data Protection & Recovery (Time Travel & Cloning)
+
+### 6.1 Time Travel & Storage Internals
+
+**Time Travel** allows you to query, clone, or restore historical data from any point in the past up to a specific retention window.
+- **Standard Edition:** Default is 1 day maximum.
+- **Enterprise Edition:** Up to 90 days.
+- **Storage Layer Mechanics:** Because Snowflake micro-partitions are **immutable**, updates or deletes do not overwrite data in place. They write a new partition and mark the old partition as "historical". Time Travel works by reading these historical micro-partition files using the metadata logs stored at the Cloud Services layer.
+
+**Time Travel Commands:**
+```sql
+-- Query historical snapshot 5 minutes ago
+SELECT * FROM employee AT(OFFSET => -300);
+
+-- Query data at a specific timestamp
+SELECT * FROM employee AT(TIMESTAMP => '2026-07-12 18:00:00'::TIMESTAMP);
+
+-- Query data as it existed before a specific statement ID
+SELECT * FROM employee BEFORE(STATEMENT => '01b2a95c-0000-1122-3344-5566778899aa');
+
+-- Restore a accidentally dropped table
+UNDROP TABLE employee;
+```
+
+---
+
+### 6.2 Time Travel vs Fail-safe vs Streams
+
+- **Time Travel:** User-managed recovery. You can query, clone, and restore historical tables using standard SQL commands.
+- **Fail-safe:** Disaster recovery only. A 7-day non-configurable safety window that starts the moment the Time Travel retention period expires. Files are compressed and only recoverable by **Snowflake Support** in disaster scenarios.
+- **Streams:** Tracks *future* changes. Time Travel queries *past* states.
+
+---
+
+### 6.3 Zero-Copy Cloning & Internals
+
+**Zero-Copy Cloning** allows you to replicate a table, schema, or database instantly without duplicating the underlying physical storage files.
+
+- **How Cloning Works Internally:**
+  - Cloning copies the metadata definitions and partition pointers at the Cloud Services layer. It does **not** copy the micro-partition files.
+  - Initially, both the source object and the cloned object point to the **same set of immutable micro-partitions**.
+- **Copy-on-Write:** If data is modified or inserted into either the source or the clone, Snowflake writes new micro-partitions containing the changed rows only. You are only billed storage fees for the **new/modified partitions** generated after cloning.
+
+---
+
+### 6.4 Cloning Levels, Methods & Combinations
+
+**Cloning Commands:**
+```sql
+-- Table level
+CREATE TABLE employee_dev CLONE employee_prod;
+
+-- Schema level
+CREATE SCHEMA hr_dev CLONE hr_prod;
+
+-- Database level
+CREATE DATABASE sales_test CLONE sales_prod;
+```
+
+**Cloning vs CTAS vs Backups:**
+
+| Method | Metadata Copy | Storage Footprint | Execution Speed | Cost |
+|--------|---------------|-------------------|-----------------|------|
+| **Clone** | Pointers only | 0 bytes initially (Copy-on-Write) | Instant (Seconds) | Free initially |
+| **CTAS (CREATE TABLE AS)** | Creates new table | Full duplicated physical files | Slow (depends on scan size) | Full storage fees |
+| **Backup** | Full DB Copy | Full duplicated storage | Very Slow | High storage + compute |
+
+**Clone + Time Travel:**
+You can clone an object to recover its state exactly as it existed at a past point in time:
+```sql
+CREATE TABLE employee_recover_table
+  CLONE employee_prod
+  AT(TIMESTAMP => '2026-07-12 12:00:00'::TIMESTAMP);
+```
+
+---
+
+## Chapter 7: Practice & Interview Prep
+
+### 7.1 Key Interview Questions
 
 - **What is a Stage?** Explain the differences between User, Table, Named, and External stages.
 - **Why is COPY INTO faster than INSERT?** `COPY INTO` bulk loads files using parallel compute threads from the warehouse directly, while `INSERT` processes statement-by-statement through the Cloud Services optimizer.
@@ -321,15 +500,27 @@ WHEN NOT MATCHED THEN
 - **Explain the multi-layer pipeline architecture (RAW -> CLEAN -> MASTER -> REPORTING).**
 - **What happens internally during a MERGE statement execution?**
 - **Why should you log validation errors to an Error Table instead of discarding them?**
+- **What is a Stream in Snowflake and how does it track changes without duplicating data?** It is a pointer metadata object that tracks transactional offsets on the base table.
+- **Explain the three stream metadata columns.** (`METADATA$ACTION`, `METADATA$ISUPDATE`, `METADATA$ROW_ID`).
+- **Why does an UPDATE show up as a DELETE and INSERT in a stream?** Because partitions are immutable; an update removes the old partition pointer and appends a new one.
+- **What is a Task in Snowflake and what state is it in upon creation?** It is an orchestrator object. It is created as `SUSPENDED` by default.
+- **What are Serverless Tasks?** Tasks that execute compute on Snowflake-managed elastic compute engines rather than requiring a dedicated virtual warehouse.
+- **What is Zero-Copy Cloning and what is Copy-on-Write?** Instant pointer replication where both source and clone share physical micro-partition files until writes occur.
+- **How does Zero-Copy Cloning differ from a standard CTAS?** Zero-copy copies metadata pointers instantly; CTAS scans and physically duplicates the storage files.
+- **What is the difference between Time Travel and Fail-safe?** Time travel is user-queryable and configurable (up to 90 days); Fail-safe is non-configurable (7 days) and only recoverable by Snowflake support.
+- **How do you restore a table that was deleted by accident?** Using `UNDROP TABLE table_name;`.
 
 ---
 
-### 5.2 Quick Tips & Gotchas
+### 7.2 Quick Tips & Gotchas
 
 - `COPY INTO` is idempotent (files already loaded successfully are skipped unless `FORCE = TRUE` is passed).
 - If your files have duplicate keys inside a single load batch, `MERGE` will fail with a "multiple updates to same target row" error. Always deduplicate source files in RAW/CLEAN before running a `MERGE` target statement.
 - Warehouse Cache is cleared when the warehouse is suspended. If you run back-to-back ETL tasks, make sure the warehouse doesn't suspend in between to keep query scans fast.
 - Materialized Views cost credits both for initial compilation and automatic maintenance when base tables change. Use them sparingly on highly active tables.
+- Querying a stream consumes its data and advances the offset bookmark. If you need to perform multiple checks on a stream, write the stream data to a temporary table first.
+- Recreating a table using `CREATE OR REPLACE TABLE` breaks any active streams associated with it because its internal table ID changes. Use `TRUNCATE TABLE` instead to maintain stream offsets.
+- Fail-safe consumes storage costs. When you clone a table, the clone doesn't pay storage fees until new partitions are modified, but if the source table is dropped, its partitions move to Time Travel/Fail-safe and keep accumulating storage costs.
 
 ---
 
