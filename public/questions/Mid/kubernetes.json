@@ -1,0 +1,52 @@
+[
+  {
+    "id": "k8s-mi-1",
+    "title": "Types of Services",
+    "question": "Explain the different types of Services in Kubernetes (ClusterIP, NodePort, LoadBalancer, ExternalName).",
+    "answer": {
+      "summary": "Services expose Pods to network traffic. ClusterIP is internal only, NodePort exposes on a specific node port, LoadBalancer provisions a cloud load balancer, and ExternalName maps to a DNS name.",
+      "content": "In Kubernetes, a **Service** is an abstraction that defines a logical set of Pods and a policy by which to access them. Since Pods are ephemeral and their IP addresses change, Services provide a stable IP address and DNS name.\n\n### Service Types\n\n1. **ClusterIP (Default)**\n   - Exposes the Service on an internal IP in the cluster.\n   - Only accessible from *within* the cluster.\n   - Use case: Internal communication between microservices.\n\n2. **NodePort**\n   - Exposes the Service on each Node's IP at a static port (default range: 30000-32767).\n   - Accessible from outside the cluster by requesting `<NodeIP>:<NodePort>`.\n   - Use case: Simple external access or setting up your own load balancing.\n\n3. **LoadBalancer**\n   - Exposes the Service externally using a cloud provider's load balancer (e.g., AWS ELB, GCP Cloud Load Balancing).\n   - Automatically creates NodePort and ClusterIP Services to route traffic.\n   - Use case: Exposing a web application to the public internet on standard ports (e.g., 80/443).\n\n4. **ExternalName**\n   - Maps the Service to the contents of the `externalName` field (e.g., `foo.bar.example.com`) by returning a CNAME record.\n   - No proxying of any kind is set up.\n   - Use case: Integrating external services (like a managed database) into the cluster namespace.",
+      "codeExamples": [
+        {
+          "language": "yaml",
+          "title": "ClusterIP Service Example",
+          "code": "apiVersion: v1\nkind: Service\nmetadata:\n  name: backend-service\nspec:\n  selector:\n    app: backend\n  ports:\n    - protocol: TCP\n      port: 80\n      targetPort: 8080\n  type: ClusterIP",
+          "explanation": "This service routes traffic on port 80 to Pods with the label app=backend on port 8080."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["service", "networking", "clusterip", "nodeport", "loadbalancer"],
+    "sublevel": "Services & Networking",
+    "years": 3,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "id": "k8s-mi-2",
+    "title": "ConfigMaps and Secrets",
+    "question": "What is the difference between ConfigMaps and Secrets, and how do you use them in a Pod?",
+    "answer": {
+      "summary": "ConfigMaps store non-confidential data in key-value pairs, while Secrets store sensitive data like passwords (base64 encoded). Both can be consumed as environment variables or mounted as files in volumes.",
+      "content": "Both **ConfigMaps** and **Secrets** are used to separate configuration from application code, making applications more portable.\n\n### ConfigMaps\n- Used to store non-confidential configuration data.\n- Examples: Application properties, environment variables, configuration files (e.g., `nginx.conf`).\n- Stored in plain text in the Kubernetes API.\n\n### Secrets\n- Used to store sensitive data.\n- Examples: Passwords, OAuth tokens, SSH keys, TLS certificates.\n- Stored as **base64-encoded** strings in the API (though modern Kubernetes supports encrypting them at rest in etcd).\n\n### How to consume them in Pods\nBoth can be consumed by Pods in three main ways:\n1. **Environment Variables**: Injecting individual keys as environment variables.\n2. **Command-line arguments**: Passing them as arguments to the container's entrypoint.\n3. **Volume Mounts**: Mounting them as files in a volume. This is useful for configuration files or certificates.",
+      "codeExamples": [
+        {
+          "language": "yaml",
+          "title": "Using ConfigMap and Secret as Env Vars",
+          "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: app-pod\nspec:\n  containers:\n  - name: app-container\n    image: my-app:1.0\n    env:\n    - name: LOG_LEVEL\n      valueFrom:\n        configMapKeyRef:\n          name: app-config\n          key: log_level\n    - name: DB_PASSWORD\n      valueFrom:\n        secretKeyRef:\n          name: db-credentials\n          key: password",
+          "explanation": "This Pod injects LOG_LEVEL from a ConfigMap and DB_PASSWORD from a Secret."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["configmap", "secret", "configuration"],
+    "sublevel": "Storage & Configuration",
+    "years": 3,
+    "difficulty": "Mid",
+    "lastUpdated": "2026-07-07"
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "k8s-se-1",
+    "title": "Kubernetes Control Plane Components",
+    "question": "Describe the core components of the Kubernetes Control Plane and their responsibilities.",
+    "answer": {
+      "summary": "The Control Plane manages the cluster. Its core components are the kube-apiserver (API frontend), etcd (key-value store), kube-scheduler (assigns Pods to nodes), and kube-controller-manager (runs controller loops).",
+      "content": "The Kubernetes Control Plane makes global decisions about the cluster (like scheduling) and detects/responds to cluster events.\n\n### 1. kube-apiserver\n- **Role**: The front end of the Kubernetes control plane.\n- **Function**: Exposes the Kubernetes API. It validates and configures data for API objects like pods, services, and replication controllers. All other components communicate through the API server.\n- **Scalability**: Can scale horizontally by deploying multiple instances.\n\n### 2. etcd\n- **Role**: Consistent and highly-available key-value store.\n- **Function**: Used as Kubernetes' backing store for all cluster data and state.\n- **Criticality**: If etcd is lost and there is no backup, the cluster state is completely lost. It requires strong consensus (using the Raft algorithm) and fast storage.\n\n### 3. kube-scheduler\n- **Role**: Assigns Pods to Nodes.\n- **Function**: Watches for newly created Pods with no assigned node, and selects a node for them to run on. Decisions are based on resource requirements, hardware/software/policy constraints, affinity/anti-affinity specifications, and data locality.\n\n### 4. kube-controller-manager\n- **Role**: Runs controller processes.\n- **Function**: A controller is a non-terminating loop that regulates the state of the system, trying to move the current state towards the desired state. Logically, each controller is a separate process, but they are compiled into a single binary.\n- **Examples**: Node controller (notices when nodes go down), Job controller, Endpoints controller, Service Account & Token controllers.\n\n*(Note: cloud-controller-manager is another component that links the cluster to a cloud provider's API.)*",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Kubernetes Components",
+          "url": "https://kubernetes.io/docs/concepts/overview/components/",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["architecture", "control-plane", "apiserver", "etcd", "scheduler"],
+    "sublevel": "Architecture & Internals",
+    "years": 5,
+    "difficulty": "Senior",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "id": "k8s-se-2",
+    "title": "Role-Based Access Control (RBAC)",
+    "question": "How does RBAC work in Kubernetes? Explain Roles, ClusterRoles, RoleBindings, and ClusterRoleBindings.",
+    "answer": {
+      "summary": "RBAC restricts network access based on user roles. Roles and RoleBindings are namespace-scoped, while ClusterRoles and ClusterRoleBindings are cluster-scoped.",
+      "content": "Role-Based Access Control (RBAC) is a method of regulating access to computer or network resources based on the roles of individual users within an enterprise. In Kubernetes, it regulates who can perform what actions on which resources.\n\n### Roles vs. ClusterRoles\nThese define **what** actions are allowed.\n\n- **Role**:\n  - Always sets permissions within a **particular namespace**.\n  - Example: Allow reading Pods in the `dev` namespace.\n- **ClusterRole**:\n  - A non-namespaced resource.\n  - Used to grant permissions on cluster-scoped resources (like Nodes), non-resource endpoints (like `/healthz`), or namespaced resources across *all* namespaces (e.g., read Pods across the entire cluster).\n\n### RoleBindings vs. ClusterRoleBindings\nThese grant the permissions defined in a role to a set of subjects (users, groups, or service accounts). They define **who** gets the permissions.\n\n- **RoleBinding**:\n  - Grants the permissions defined in a Role to a user or set of users within a **specific namespace**.\n  - Can reference a Role in the same namespace, or a ClusterRole (to grant common permissions in a specific namespace without redefining the Role everywhere).\n- **ClusterRoleBinding**:\n  - Grants permissions cluster-wide and across all namespaces.\n  - Can only reference a ClusterRole.",
+      "codeExamples": [
+        {
+          "language": "yaml",
+          "title": "Role and RoleBinding Example",
+          "code": "---\napiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  namespace: default\n  name: pod-reader\nrules:\n- apiGroups: [\"\"] # \"\" indicates the core API group\n  resources: [\"pods\"]\n  verbs: [\"get\", \"watch\", \"list\"]\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: read-pods\n  namespace: default\nsubjects:\n- kind: User\n  name: jane # Name is case sensitive\n  apiGroup: rbac.authorization.k8s.io\nroleRef:\n  kind: Role #this must be Role or ClusterRole\n  name: pod-reader # this must match the name of the Role\n  apiGroup: rbac.authorization.k8s.io",
+          "explanation": "This configuration allows the user 'jane' to read Pods in the 'default' namespace."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["rbac", "security", "authorization", "roles", "bindings"],
+    "sublevel": "Security & Scaling",
+    "years": 5,
+    "difficulty": "Senior",
+    "lastUpdated": "2026-07-07"
+  }
+]

@@ -1,0 +1,129 @@
+[
+  {
+    "id": "dp-se-1",
+    "title": "Circuit Breaker Pattern in Microservices",
+    "question": "Explain the Circuit Breaker pattern. How does it prevent cascading failures in cloud-native applications? Provide a real-world example explaining its core states (Closed, Open, Half-Open).",
+    "answer": {
+      "summary": "The Circuit Breaker pattern prevents an application from repeatedly trying to execute an operation that's likely to fail. It acts as a proxy for operations that might fail, monitoring for failures and preventing further calls if a threshold is reached, protecting resources and allowing the failing service to recover.",
+      "content": "### What is the Circuit Breaker Pattern?\nIn distributed cloud systems, calls to remote resources and services can fail due to transient issues, such as slow network connections, timeouts, or resources being overcommitted. If multiple callers are retrying a failing service, it can lead to cascading failures across the system. The Circuit Breaker pattern wraps a fragile function call with a stateful proxy that monitors for failures.\n\n### Core States\n- **Closed**: The circuit is closed, and requests flow normally to the downstream service. If the failure rate exceeds a certain threshold (e.g., 50% of requests fail within 10 seconds), the circuit trips and moves to the Open state.\n- **Open**: The circuit is open. Requests from the application immediately fail and an exception/fallback is returned without even trying to call the failing service. This gives the failing service time to recover without being hammered by retries.\n- **Half-Open**: After a configured timeout, the circuit allows a limited number of test requests to pass through. If these requests succeed, it assumes the service has recovered and transitions back to **Closed**. If they fail, it trips back to **Open**.\n\n### Real-World Example\nImagine an e-commerce checkout service calling a payment gateway (Stripe/PayPal).\nIf the payment gateway becomes degraded and starts timing out, threads on the checkout service will block waiting for responses. Eventually, the checkout service runs out of threads, bringing down the entire e-commerce site (cascading failure). \nBy wrapping the payment call in a Circuit Breaker (like Resilience4j or Hystrix), after a few timeouts, the circuit trips to **Open**. The checkout service instantly falls back to returning a message: \"Payments temporarily unavailable, please try again in 5 minutes,\" preserving its own resources and keeping the rest of the site functional.",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Resilience4j Circuit Breaker in Spring Boot",
+          "code": "@Service\npublic class PaymentService {\n\n    @CircuitBreaker(name = \"paymentGateway\", fallbackMethod = \"fallbackPayment\")\n    public PaymentResponse processPayment(PaymentRequest request) {\n        // Call to external payment gateway that might fail\n        return restTemplate.postForObject(\"https://api.payment-gateway.com/charge\", request, PaymentResponse.class);\n    }\n\n    public PaymentResponse fallbackPayment(PaymentRequest request, CallNotPermittedException ex) {\n        // Fallback logic when circuit is OPEN\n        return new PaymentResponse(\"FAILED\", \"Payment gateway unavailable. Please try again later.\");\n    }\n}",
+          "explanation": "The `@CircuitBreaker` annotation monitors the `processPayment` method. If it fails repeatedly, the circuit opens, and subsequent calls immediately route to the `fallbackPayment` method without making network calls."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Microsoft Cloud Design Patterns: Circuit Breaker",
+          "url": "https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "cloud", "microservices", "resilience"],
+    "sublevel": "Cloud Patterns",
+    "years": 5,
+    "difficulty": "Senior",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-se-2",
+    "title": "CQRS and Event Sourcing",
+    "question": "What are CQRS (Command Query Responsibility Segregation) and Event Sourcing? Why are they often used together in highly scalable cloud architectures, and what are their trade-offs?",
+    "answer": {
+      "summary": "CQRS separates read and write operations into distinct models, allowing independent scaling. Event Sourcing stores the state of a system as a sequence of immutable events rather than just the current state. Together, they provide high scalability and a complete audit trail, but introduce eventual consistency and complexity.",
+      "content": "### CQRS (Command Query Responsibility Segregation)\nCQRS dictates that the data structures used for updating (Commands) should be strictly separated from the data structures used for reading (Queries). \n- **Commands (Writes):** Task-based operations that change state (e.g., `BookFlight`, `CancelReservation`). They are processed by a write-optimized database (like a relational DB or write-heavy NoSQL).\n- **Queries (Reads):** Operations that just return data. They pull from read-optimized data stores (e.g., Elasticsearch, Redis, or materialized views).\n\n### Event Sourcing\nInstead of updating a database record in place (CRUD), Event Sourcing involves saving every state change as an immutable event in an append-only Event Store (like Kafka or EventStoreDB). The current state is derived by replaying these events.\n\n### Why Use Them Together?\nIn a cloud environment, writes and reads often have vastly different scaling requirements. \nWhen a command generates an event (Event Sourcing), that event is published to a message bus. Various read models (CQRS) listen to these events and update their own optimized data stores. This allows you to scale read nodes infinitely and independently from write nodes.\n\n### Real-World Example\n**Banking Application:**\n- **Event Sourcing:** When you deposit $50, an `AccountCredited` event is appended. When you withdraw $20, an `AccountDebited` event is appended. The current balance ($30) is a projection of these events. This provides a perfect audit log.\n- **CQRS:** The command side ensures you don't overdraw. The read side might have a NoSQL database updated asynchronously, providing lightning-fast balance queries for the mobile app.\n\n### Trade-offs\n- **Pros:** Independent scaling, perfect audit trails, point-in-time recovery, optimized data models for specific tasks.\n- **Cons:** High complexity, **eventual consistency** (the read database might lag behind the write database), and steep learning curve.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Martin Fowler on CQRS",
+          "url": "https://martinfowler.com/bliki/CQRS.html",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "architecture", "cqrs", "event-sourcing", "distributed-data"],
+    "sublevel": "Distributed Data",
+    "years": 6,
+    "difficulty": "Senior",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-se-3",
+    "title": "Saga Pattern for Distributed Transactions",
+    "question": "What is the Saga pattern and how does it manage data consistency across microservices compared to traditional 2PC (Two-Phase Commit)? Explain the differences between Choreography and Orchestration.",
+    "answer": {
+      "summary": "The Saga pattern manages distributed transactions across multiple microservices without using distributed locks (like 2PC). It relies on a sequence of local transactions, where each step publishes an event or sends a command to trigger the next step. If a step fails, compensating transactions are executed to undo previous steps.",
+      "content": "### The Problem with 2PC in the Cloud\nTraditional Two-Phase Commit (2PC) guarantees strict ACID properties across multiple databases by locking resources until all participants agree to commit. In a distributed cloud microservices architecture, locking resources across network boundaries severely impacts availability and scalability (CAP theorem favors AP over CA in the cloud).\n\n### The Saga Pattern\nA Saga is a sequence of local transactions. Each microservice updates its own local database and publishes a message/event to trigger the next local transaction in the saga. \nIf a local transaction fails, the saga executes **compensating transactions** to undo the changes made by the preceding local transactions. It ensures **Eventual Consistency**.\n\n### Real-World Example: Travel Booking\nBooking a trip requires: 1. Booking a Flight, 2. Booking a Hotel, 3. Booking a Car.\n- **Success Path:** Flight booked -> Hotel booked -> Car booked.\n- **Failure Path (Hotel full):** Flight booked -> Hotel booking fails -> Saga triggers a `CancelFlight` compensation transaction -> User gets a failure message.\n\n### Choreography vs. Orchestration\n1. **Choreography (Event-Driven):** There is no central coordinator. Services subscribe to each other's events and react accordingly.\n   - *Pros:* Decentralized, no single point of failure, good for simple workflows (2-4 steps).\n   - *Cons:* Hard to track the overall status of the transaction. \"Spaghetti architecture\" if too complex.\n2. **Orchestration (Command-Driven):** A central coordinator (the Saga Orchestrator) tells participating services what local transactions to execute.\n   - *Pros:* Clear flow of logic, easy to monitor state, good for complex workflows.\n   - *Cons:* Introduces a single point of failure (the orchestrator itself, though it can be clustered), risk of putting too much business logic in the orchestrator.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Saga distributed transactions pattern",
+          "url": "https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "microservices", "transactions", "saga", "cloud"],
+    "sublevel": "Distributed Data",
+    "years": 5,
+    "difficulty": "Senior",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-se-4",
+    "title": "Strangler Fig Pattern for Cloud Migration",
+    "question": "Describe the Strangler Fig pattern. How is it used for migrating legacy monolithic applications to a modern cloud-native microservices architecture?",
+    "answer": {
+      "summary": "The Strangler Fig pattern is a strategy for incrementally migrating a legacy system by gradually replacing specific functionalities with new applications and services. A facade routes requests between the legacy system and the new services until the legacy system is completely replaced.",
+      "content": "### What is the Strangler Fig Pattern?\nNamed after a vine that wraps around a host tree and eventually takes over, this pattern allows for a safe, incremental migration from a monolith to microservices. Instead of a risky \"big bang\" rewrite, you replace the legacy system piece by piece.\n\n### How it Works\n1. **Create a Facade (API Gateway/Router):** Place a routing proxy in front of the legacy application. Initially, all traffic goes to the legacy system.\n2. **Build New Services:** Develop a specific feature (e.g., \"User Authentication\" or \"Inventory\") as a new, modern microservice in the cloud.\n3. **Route Traffic:** Configure the facade to intercept calls for the newly built feature and route them to the new microservice. All other calls continue to hit the monolith.\n4. **Rinse and Repeat:** Incrementally extract features into new services, routing traffic to them. Over time, the monolithic legacy system is \"strangled\" as its functionality shrinks.\n5. **Retire:** Once all features have been migrated, the legacy system is decommissioned.\n\n### Real-World Example\nA large e-commerce monolith runs on-premise. The company wants to move to AWS.\n- They set up an AWS API Gateway (the facade).\n- They extract the `Recommendations` engine first and build it on AWS Lambda and DynamoDB. The API Gateway routes `/api/recommendations` to AWS, and everything else back to the on-prem monolith.\n- Next, they extract `Checkout`, then `Catalog`.\n- Eventually, the on-prem servers are shut down.\n\n### Benefits\n- Reduces the risk of migration failure.\n- Delivers continuous value as new features can be built in the modern stack immediately.\n- Allows the team to learn the new tech stack incrementally.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Strangler Fig Pattern - Martin Fowler",
+          "url": "https://martinfowler.com/bliki/StranglerFigApplication.html",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "cloud-migration", "architecture", "microservices"],
+    "sublevel": "Cloud Patterns",
+    "years": 4,
+    "difficulty": "Senior",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-se-5",
+    "title": "Sidecar Pattern in Kubernetes",
+    "question": "Explain the Sidecar pattern and its role in cloud deployments (e.g., Kubernetes pods). Provide examples of cross-cutting concerns typically handled by a Sidecar.",
+    "answer": {
+      "summary": "The Sidecar pattern deploys a helper component alongside the main application container within the same lifecycle and network space. It abstracts cross-cutting concerns (like logging, proxying, or secrets management) away from the main application, promoting single responsibility and language-agnostic infrastructure.",
+      "content": "### What is the Sidecar Pattern?\nIn a microservices ecosystem, every service needs to handle operational capabilities: logging, monitoring, network routing, security, and configuration. Instead of building these into the application code (which creates tightly coupled, language-specific bloat), the Sidecar pattern delegates these tasks to a separate process or container that runs alongside the primary application.\n\nIn Kubernetes, a pod can contain multiple containers. A primary container runs the business logic, and a sidecar container runs the infrastructural support.\n\n### Common Use Cases\n- **Service Mesh Proxy (e.g., Envoy in Istio):** The sidecar intercepts all incoming and outgoing network traffic. It handles TLS termination, circuit breaking, retries, and routing without the application knowing.\n- **Log Shipping / Fluentd:** The main app writes logs to stdout or a file. The sidecar reads these logs and forwards them to a centralized logging system like Datadog or Splunk.\n- **Configuration and Secrets Management:** The sidecar pulls secrets from HashiCorp Vault or AWS Secrets Manager and provides them locally to the application.\n\n### Real-World Example\nA Node.js web application needs to securely communicate with a payment service, requiring mutual TLS (mTLS) and retry logic.\nInstead of writing complex mTLS and retry logic in Node.js, you deploy the Node.js app in a Kubernetes pod alongside an Envoy proxy sidecar.\nThe Node.js app simply makes a plain HTTP call to `http://localhost:8080`. The Envoy sidecar intercepts the call, wraps it in mTLS, handles any necessary retries, and forwards it to the payment service. \n\n### Benefits\n- **Separation of Concerns:** Developers focus on business logic, platform engineers focus on sidecars.\n- **Language Agnostic:** You can use the same logging or proxy sidecar for Java, Node.js, and Go applications.\n- **Lifecycle Coupling:** The sidecar shares the same network and disk volumes as the primary app, and they start/stop together.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Sidecar pattern - Azure Architecture Center",
+          "url": "https://learn.microsoft.com/en-us/azure/architecture/patterns/sidecar",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "kubernetes", "containers", "sidecar", "cloud"],
+    "sublevel": "Cloud Patterns",
+    "years": 4,
+    "difficulty": "Senior",
+    "lastUpdated": "2023-10-25"
+  }
+]

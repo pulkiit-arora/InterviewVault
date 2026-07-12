@@ -1,0 +1,51 @@
+[
+  {
+    "id": "k8s-ju-1",
+    "title": "What is Kubernetes?",
+    "question": "What is Kubernetes and why is it used?",
+    "answer": {
+      "summary": "Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, and management of containerized applications.",
+      "content": "Kubernetes (also known as K8s) is an open-source system for automating deployment, scaling, and management of containerized applications. It was originally designed by Google and is now maintained by the Cloud Native Computing Foundation (CNCF).\n\n### Key Benefits:\n- **Service discovery and load balancing**: Exposes a container using a DNS name or its own IP address.\n- **Storage orchestration**: Automatically mounts the storage system of your choice, such as local storage, public cloud providers, etc.\n- **Automated rollouts and rollbacks**: Describes the desired state for deployed containers, and changes the actual state to the desired state at a controlled rate.\n- **Self-healing**: Restarts containers that fail, replaces containers, kills containers that don't respond to your user-defined health check.\n- **Secret and configuration management**: Stores and manages sensitive information, such as passwords, OAuth tokens, and SSH keys.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Kubernetes Documentation - What is Kubernetes?",
+          "url": "https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["kubernetes", "orchestration", "basics"],
+    "sublevel": "Core Concepts",
+    "years": 1,
+    "difficulty": "Junior",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "id": "k8s-ju-2",
+    "title": "Pods vs Containers",
+    "question": "What is a Pod in Kubernetes, and how does it differ from a container?",
+    "answer": {
+      "summary": "A Pod is the smallest deployable computing unit in Kubernetes. It encapsulates one or more containers that share storage, network resources, and an execution context.",
+      "content": "In Kubernetes, you don't run containers directly; instead, you run **Pods**.\n\n### What is a Pod?\n- The smallest and simplest Kubernetes object.\n- Represents a single instance of a running process in your cluster.\n- Contains one or more containers (e.g., Docker containers).\n\n### Pods vs Containers\n- **Container**: An isolated environment that packages your application code and its dependencies.\n- **Pod**: A wrapper around one or more containers. If a Pod has multiple containers, they always run on the same Node, share the same IP address and port space, and can communicate with each other via `localhost`.\n\n### Why use Pods?\nPods allow tightly coupled containers to share resources. For example, you might have a main web server container and a 'sidecar' container that pulls updates or ships logs, both running inside the same Pod.",
+      "codeExamples": [
+        {
+          "language": "yaml",
+          "title": "Basic Pod Definition",
+          "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx-pod\n  labels:\n    app: nginx\nspec:\n  containers:\n  - name: nginx-container\n    image: nginx:latest\n    ports:\n    - containerPort: 80",
+          "explanation": "This YAML defines a simple Pod containing a single Nginx container."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["pod", "container", "yaml"],
+    "sublevel": "Pods & Workloads",
+    "years": 1,
+    "difficulty": "Junior",
+    "lastUpdated": "2026-07-07"
+  }
+]

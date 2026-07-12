@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ss-gen-1",
+    "title": "Handling Constructive Feedback",
+    "question": "Can you describe a time you received constructive criticism from a senior developer or manager? How did you respond, and what did you learn?",
+    "answer": {
+      "summary": "This question assesses coachability, humility, and the ability to separate self-worth from code quality. A good answer focuses on listening, understanding the feedback without getting defensive, and applying it to improve.",
+      "content": "### What Interviewers Look For\n- **Humility:** Acknowledging that there's always room for improvement, especially early in a career.\n- **Growth Mindset:** Viewing feedback as a tool for learning rather than a personal attack.\n- **Actionable Change:** Giving a concrete example of how the feedback changed future behavior.\n\n### Example Structure\n1. **The Situation:** Briefly describe the project or code review.\n2. **The Feedback:** State exactly what the criticism was (e.g., 'My code was inefficient' or 'I didn't follow the style guide').\n3. **The Reaction:** Honestly describe your initial reaction, but emphasize how you processed it professionally.\n4. **The Outcome:** Explain the changes you made and the positive result.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["soft-skills", "communication", "feedback"],
+    "sublevel": "Communication",
+    "years": 1,
+    "difficulty": "General",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "ss-gen-2",
+    "title": "Resolving Technical Disagreements",
+    "question": "Tell me about a time you disagreed with a team member on a technical approach. How did you resolve the conflict and what was the outcome?",
+    "answer": {
+      "summary": "This evaluates conflict resolution and technical communication. The ideal candidate relies on objective metrics, prototypes, and respectful discussion rather than ego or hierarchy to resolve disagreements.",
+      "content": "### What Interviewers Look For\n- **Objectivity:** Using data, benchmarks, or architectural principles to drive decisions instead of personal preference.\n- **Empathy:** Understanding the other person's perspective and concerns.\n- **Compromise:** Willingness to find middle ground or disagree and commit if the decision goes another way.\n\n### Example Structure\n1. **The Conflict:** Explain the technical disagreement clearly (e.g., 'We disagreed on whether to use REST or GraphQL').\n2. **The Approach:** How did you handle it? Did you schedule a meeting, write a design doc, or build a quick prototype?\n3. **The Resolution:** How was the final decision made?\n4. **The Takeaway:** What did you learn about collaboration from this experience?",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["soft-skills", "conflict-resolution", "teamwork"],
+    "sublevel": "Conflict Resolution",
+    "years": 3,
+    "difficulty": "General",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "ss-gen-3",
+    "title": "Managing Underperforming Team Members",
+    "question": "Describe your approach to dealing with a team member who is consistently underperforming or missing deadlines. How do you balance empathy with project delivery?",
+    "answer": {
+      "summary": "This assesses people management and leadership maturity. A strong answer involves identifying root causes, providing clear and actionable feedback, offering support, and setting measurable goals.",
+      "content": "### What Interviewers Look For\n- **Root Cause Analysis:** Recognizing that underperformance can stem from personal issues, lack of skills, unclear expectations, or burnout.\n- **Direct but Empathetic Communication:** Having difficult conversations privately and respectfully.\n- **Action Plans:** Collaborating on a Performance Improvement Plan (PIP) or setting clear, achievable milestones.\n- **Accountability:** Knowing when to escalate if there is no improvement despite support.\n\n### Key Steps in the Approach\n1. **Gather Data:** Collect specific examples of missed deadlines or subpar work.\n2. **Private 1-on-1:** Approach the individual with curiosity, not just accusation (e.g., 'I noticed you've been struggling with X. How can I support you?').\n3. **Identify Blockers:** Determine if they need more training, clearer requirements, or time off.\n4. **Set Clear Expectations:** Define what success looks like over the next 2-4 weeks.\n5. **Follow Up:** Schedule regular check-ins to monitor progress.",
+      "codeExamples": [],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["soft-skills", "people-management", "leadership"],
+    "sublevel": "People Management",
+    "years": 6,
+    "difficulty": "General",
+    "lastUpdated": "2023-10-25"
+  }
+]

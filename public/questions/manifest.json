@@ -6,6 +6,10 @@
         "Collections": [],
         "Multithreading": [],
         "Data Structures": []
+      },
+      "kubernetes": {
+        "Core Concepts": [],
+        "Pods & Workloads": []
       }
     },
     "Mid": {
@@ -17,6 +21,15 @@
       },
       "database": {
         "SQL Basics": []
+      },
+      "design-patterns": {
+        "Creational Patterns": [],
+        "Structural Patterns": [],
+        "Behavioral Patterns": []
+      },
+      "kubernetes": {
+        "Services & Networking": [],
+        "Storage & Configuration": []
       }
     },
     "Senior": {
@@ -27,6 +40,24 @@
       },
       "database": {
         "Partitioning": []
+      },
+      "design-patterns": {
+        "Cloud Patterns": [],
+        "Distributed Data": []
+      },
+      "kubernetes": {
+        "Architecture & Internals": [],
+        "Security & Scaling": []
+      }
+    },
+    "Soft Skills": {
+      "general": {
+        "Communication": [],
+        "Teamwork": [],
+        "Conflict Resolution": [],
+        "Mentoring": [],
+        "People Management": [],
+        "Leadership & Strategy": []
       }
     }
   }

@@ -9,8 +9,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const LEVELS = ['Junior', 'Mid', 'Senior'];
-const TECHS = ['java', 'database'];
+const LEVELS = ['Junior', 'Mid', 'Senior', 'Soft Skills'];
+const TECHS = ['java', 'database', 'design-patterns', 'kubernetes', 'general'];
 
 function validateQuestion(question) {
   const errors = [];

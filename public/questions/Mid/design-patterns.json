@@ -1,0 +1,133 @@
+[
+  {
+    "id": "dp-mid-1",
+    "title": "Singleton Pattern",
+    "question": "Explain the Singleton pattern. What problem does it solve, and what are the potential drawbacks of using it? Provide a thread-safe example in Java.",
+    "answer": {
+      "summary": "The Singleton pattern restricts a class to instantiating only one object and provides a global point of access to it. It's useful for shared resources like database connections or configuration managers. Drawbacks include hidden dependencies, difficult testing, and potential thread-safety issues if not implemented correctly.",
+      "content": "### What is the Singleton Pattern?\nThe Singleton pattern ensures that a class has only one instance and provides a global point of access to that instance. It is a **Creational** pattern.\n\n### When to use it?\n- Managing a shared resource (e.g., a connection pool to a database).\n- Managing configuration settings that need to be read globally.\n- Managing a cache.\n\n### Drawbacks\n- **Global State:** It introduces global state into an application, which can make debugging difficult because the state can be altered from anywhere.\n- **Testing:** Singletons are notoriously hard to unit test. They carry state across tests, often requiring mocking frameworks or reflection to reset.\n- **Hidden Dependencies:** A class that uses a Singleton hides its dependency on it, rather than explicitly requesting it via constructor injection.\n- **Concurrency Issues:** If not implemented carefully, multiple threads could create multiple instances simultaneously.\n\n### Thread-Safe Implementation (Java)\nThe best way to implement a Singleton in modern Java is using an `enum`. If you must use a class, the 'Double-Checked Locking' or 'Bill Pugh Singleton (Initialization-on-demand holder idiom)' are preferred for lazy loading.",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Double-Checked Locking Singleton",
+          "code": "public class DatabaseConnection {\n    // volatile ensures that multiple threads handle the uniqueInstance variable correctly\n    private static volatile DatabaseConnection instance;\n\n    // Private constructor prevents instantiation from outside\n    private DatabaseConnection() {\n        // initialization code\n    }\n\n    public static DatabaseConnection getInstance() {\n        if (instance == null) { // First check (no locking)\n            synchronized (DatabaseConnection.class) {\n                if (instance == null) { // Second check (with locking)\n                    instance = new DatabaseConnection();\n                }\n            }\n        }\n        return instance;\n    }\n}",
+          "explanation": "Double-checked locking ensures that the expensive `synchronized` block is only executed once, when the instance is first created. `volatile` is crucial to prevent the compiler from reordering instructions, which could return a partially initialized object."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": [
+        {
+          "title": "Refactoring Guru: Singleton",
+          "url": "https://refactoring.guru/design-patterns/singleton",
+          "type": "link"
+        }
+      ]
+    },
+    "tags": ["design-patterns", "creational", "singleton", "java", "concurrency"],
+    "sublevel": "Creational Patterns",
+    "years": 2,
+    "difficulty": "Mid",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-mid-2",
+    "title": "Factory Method Pattern",
+    "question": "What is the Factory Method pattern? How does it differ from a simple factory, and why is it useful for decoupling code?",
+    "answer": {
+      "summary": "The Factory Method pattern defines an interface for creating an object, but lets subclasses decide which class to instantiate. It defers instantiation to subclasses, promoting loose coupling by allowing the client code to work with abstractions rather than concrete implementations.",
+      "content": "### What is the Factory Method Pattern?\nIt is a **Creational** pattern that provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created.\n\n### Simple Factory vs. Factory Method\n- **Simple Factory:** Just a static method (often in a dedicated `Factory` class) containing a large `switch` or `if/else` statement that returns different concrete classes based on a parameter.\n- **Factory Method:** Relies on inheritance. The creator class declares an abstract `createProduct()` method. Subclasses of the creator override this method to instantiate and return specific concrete products.\n\n### Why is it useful?\n- **Decoupling:** The code that uses the factory (the client) only interacts with the abstract Product interface, not the concrete classes.\n- **Open/Closed Principle:** You can introduce new product types into the program without breaking existing client code. You just create a new Creator subclass.\n- **Single Responsibility Principle:** You move the product creation code into a dedicated place, making the code easier to support.",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Factory Method Example",
+          "code": "// 1. The Product Interface\npublic interface Notification {\n    void notifyUser();\n}\n\n// 2. Concrete Products\npublic class SMSNotification implements Notification {\n    public void notifyUser() { System.out.println(\"Sending an SMS\"); }\n}\npublic class EmailNotification implements Notification {\n    public void notifyUser() { System.out.println(\"Sending an Email\"); }\n}\n\n// 3. The Creator (Abstract Factory)\npublic abstract class NotificationService {\n    // The Factory Method\n    protected abstract Notification createNotification();\n\n    public void sendNotification() {\n        Notification notification = createNotification();\n        notification.notifyUser();\n    }\n}\n\n// 4. Concrete Creators\npublic class SMSNotificationService extends NotificationService {\n    @Override\n    protected Notification createNotification() {\n        return new SMSNotification();\n    }\n}\n\n// Client Usage\nNotificationService service = new SMSNotificationService();\nservice.sendNotification(); // Outputs: Sending an SMS",
+          "explanation": "The `NotificationService` doesn't know *which* notification is being created, only that it can call `notifyUser()` on it."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["design-patterns", "creational", "factory", "java"],
+    "sublevel": "Creational Patterns",
+    "years": 2,
+    "difficulty": "Mid",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-mid-3",
+    "title": "Builder Pattern",
+    "question": "When should you use the Builder pattern instead of a constructor or setters? Give an example of how it is implemented.",
+    "answer": {
+      "summary": "The Builder pattern separates the construction of a complex object from its representation. It is used when an object has many optional parameters, preventing the 'Telescoping Constructor' anti-pattern and avoiding invalid intermediate states that occur when using setters.",
+      "content": "### What is the Builder Pattern?\nBuilder is a **Creational** design pattern that lets you construct complex objects step by step. The pattern allows you to produce different types and representations of an object using the same construction code.\n\n### When to use it?\n1. **Too many constructor parameters:** When a class has 5+ parameters, especially if many are optional. This leads to the 'Telescoping Constructor' anti-pattern (constructors calling other constructors with null/default values).\n2. **Immutability:** If you use setters to build an object step-by-step, the object is mutable and might be in an inconsistent state halfway through. The Builder allows you to set all properties on the builder first, and then create a fully initialized, **immutable** object in one go.\n\n### How it works\nYou create a nested static `Builder` class. The builder has the same fields as the target class. It exposes fluent setter methods (methods that return `this`). Finally, a `build()` method calls a private constructor on the target class, passing the builder instance.",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Builder Pattern in Java",
+          "code": "public class User {\n    private final String firstName; // Required\n    private final String lastName;  // Required\n    private final int age;          // Optional\n    private final String phone;     // Optional\n\n    // Private constructor takes the builder\n    private User(UserBuilder builder) {\n        this.firstName = builder.firstName;\n        this.lastName = builder.lastName;\n        this.age = builder.age;\n        this.phone = builder.phone;\n    }\n\n    public static class UserBuilder {\n        private final String firstName;\n        private final String lastName;\n        private int age;\n        private String phone;\n\n        // Required parameters go in builder constructor\n        public UserBuilder(String firstName, String lastName) {\n            this.firstName = firstName;\n            this.lastName = lastName;\n        }\n\n        // Optional setters return the builder itself (fluent interface)\n        public UserBuilder age(int age) {\n            this.age = age;\n            return this;\n        }\n\n        public UserBuilder phone(String phone) {\n            this.phone = phone;\n            return this;\n        }\n\n        public User build() {\n            return new User(this);\n        }\n    }\n}\n\n// Usage\nUser user = new User.UserBuilder(\"John\", \"Doe\")\n    .age(30)\n    .phone(\"123-456-7890\")\n    .build();",
+          "explanation": "The resulting `User` object is completely immutable. We didn't need to pass `null` or `-1` for optional fields we didn't care about."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["design-patterns", "creational", "builder", "java", "immutability"],
+    "sublevel": "Creational Patterns",
+    "years": 3,
+    "difficulty": "Mid",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-mid-4",
+    "title": "Strategy Pattern",
+    "question": "Describe the Strategy pattern. How does it promote the Open/Closed Principle? Give a practical example.",
+    "answer": {
+      "summary": "The Strategy pattern defines a family of algorithms, encapsulates each one in a separate class, and makes their objects interchangeable at runtime. It promotes the Open/Closed Principle by allowing new algorithms to be added without modifying the context class that uses them.",
+      "content": "### What is the Strategy Pattern?\nStrategy is a **Behavioral** design pattern that turns a set of behaviors into objects and makes them interchangeable inside an original context object. \nInstead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of algorithms to use.\n\n### The Open/Closed Principle (OCP)\nOCP states that classes should be open for extension but closed for modification. \nWithout the Strategy pattern, you might have a class with a giant `switch` statement executing different algorithms based on a flag. If you want to add a new algorithm, you must modify that class (breaking OCP).\nWith the Strategy pattern, you define an interface for the algorithm. The context class holds a reference to this interface. To add a new algorithm, you simply create a new class implementing the interface. The context class remains entirely unmodified.\n\n### Practical Example\nSorting algorithms, payment methods, or navigation routes.\nImagine a mapping application. The route calculation logic varies depending on the transport method (walking, driving, cycling).",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Strategy Pattern: Payment Processing",
+          "code": "// 1. Strategy Interface\npublic interface PaymentStrategy {\n    void pay(int amount);\n}\n\n// 2. Concrete Strategies\npublic class CreditCardStrategy implements PaymentStrategy {\n    public void pay(int amount) { System.out.println(amount + \" paid with Credit Card\"); }\n}\npublic class PayPalStrategy implements PaymentStrategy {\n    public void pay(int amount) { System.out.println(amount + \" paid with PayPal\"); }\n}\n\n// 3. Context\npublic class ShoppingCart {\n    private PaymentStrategy strategy;\n\n    // Set strategy at runtime\n    public void setPaymentStrategy(PaymentStrategy strategy) {\n        this.strategy = strategy;\n    }\n\n    public void checkout(int amount) {\n        strategy.pay(amount);\n    }\n}\n\n// Usage\nShoppingCart cart = new ShoppingCart();\ncart.setPaymentStrategy(new PayPalStrategy());\ncart.checkout(100); // Outputs: 100 paid with PayPal",
+          "explanation": "If we want to add `ApplePayStrategy` tomorrow, `ShoppingCart` doesn't need to change at all."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["design-patterns", "behavioral", "strategy", "java", "solid"],
+    "sublevel": "Behavioral Patterns",
+    "years": 3,
+    "difficulty": "Mid",
+    "lastUpdated": "2023-10-25"
+  },
+  {
+    "id": "dp-mid-5",
+    "title": "Observer Pattern",
+    "question": "What is the Observer pattern? Explain how it implements a publish-subscribe mechanism and where you would use it in UI development or event-driven systems.",
+    "answer": {
+      "summary": "The Observer pattern defines a one-to-many dependency where one object (the Subject) notifies multiple dependents (Observers) of state changes automatically. It decoupled the publisher from the subscribers, commonly used in GUI event listeners and reactive programming.",
+      "content": "### What is the Observer Pattern?\nObserver is a **Behavioral** design pattern that lets you define a subscription mechanism to notify multiple objects about any events that happen to the object they're observing.\n\n### Components\n1. **Subject (Publisher):** Maintains a list of observers and sends notifications when its state changes. It knows nothing about the concrete observers, only that they implement a common interface.\n2. **Observer (Subscriber):** Implements an `update()` method that the Subject calls when a state change occurs.\n\n### Use Cases\n- **UI Development:** The Model-View-Controller (MVC) architecture relies heavily on this. The View observes the Model. When the Model updates (e.g., data is fetched), it notifies the View to re-render. Event listeners (e.g., `button.onClick`) are also an implementation of Observer.\n- **Event-Driven Systems:** Node.js `EventEmitter` or messaging systems (like Kafka or RabbitMQ) conceptually use a distributed form of the Observer pattern (often called Pub/Sub).\n\n### Observer vs Pub/Sub\nWhile similar, Pub/Sub usually introduces a third component (an Event Channel or Message Broker) between publishers and subscribers, whereas in the classic Observer pattern, the Subject and Observers are aware of each other (via interfaces).",
+      "codeExamples": [
+        {
+          "language": "java",
+          "title": "Observer Pattern: Weather Station",
+          "code": "// 1. Observer Interface\npublic interface WeatherObserver {\n    void update(float temperature);\n}\n\n// 2. Subject Interface\npublic interface Subject {\n    void attach(WeatherObserver o);\n    void detach(WeatherObserver o);\n    void notifyObservers();\n}\n\n// 3. Concrete Subject\npublic class WeatherStation implements Subject {\n    private List<WeatherObserver> observers = new ArrayList<>();\n    private float temperature;\n\n    public void setTemperature(float temp) {\n        this.temperature = temp;\n        notifyObservers();\n    }\n\n    public void attach(WeatherObserver o) { observers.add(o); }\n    public void detach(WeatherObserver o) { observers.remove(o); }\n    \n    public void notifyObservers() {\n        for (WeatherObserver o : observers) {\n            o.update(temperature);\n        }\n    }\n}\n\n// 4. Concrete Observer\npublic class PhoneDisplay implements WeatherObserver {\n    public void update(float temperature) {\n        System.out.println(\"Phone Display: Temp is now \" + temperature);\n    }\n}\n\n// Usage\nWeatherStation station = new WeatherStation();\nPhoneDisplay phone = new PhoneDisplay();\nstation.attach(phone);\nstation.setTemperature(25.5f); // Phone automatically prints update",
+          "explanation": "The `WeatherStation` doesn't need to know it's updating a phone, a watch, or a web dashboard. It just loops through its observers and calls `update()`."
+        }
+      ],
+      "images": [],
+      "videos": [],
+      "resources": []
+    },
+    "tags": ["design-patterns", "behavioral", "observer", "java", "events"],
+    "sublevel": "Behavioral Patterns",
+    "years": 2,
+    "difficulty": "Mid",
+    "lastUpdated": "2023-10-25"
+  }
+]
