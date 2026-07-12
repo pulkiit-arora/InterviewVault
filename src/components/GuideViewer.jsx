@@ -1,43 +1,38 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { marked } from 'marked'
+import { marked, Renderer } from 'marked'
 
-marked.setOptions({ breaks: true, gfm: true })
-
-// Slugify heading text to match marked's anchor IDs
+// ── Slug helper (must match heading IDs we write) ──────────────────
 function slugify(text) {
   return text
+    .replace(/<[^>]*>/g, '')   // strip HTML tags
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
 }
 
-// Parse headings from markdown into a nested structure
-function parseHeadings(md) {
-  const lines = md.split('\n')
-  const headings = []
+// ── Custom renderer: adds id= to every heading ─────────────────────
+const renderer = new Renderer()
+renderer.heading = function ({ text, depth }) {
+  const id = slugify(text)
+  return `<h${depth} id="${id}">${text}</h${depth}>\n`
+}
+marked.use({ renderer, breaks: true, gfm: true })
 
-  for (const line of lines) {
-    const h2 = line.match(/^##\s+(.+)/)
-    const h3 = line.match(/^###\s+(.+)/)
-    if (h2) {
-      headings.push({ level: 2, text: h2[1].replace(/[#*`]/g, '').trim(), children: [] })
-    } else if (h3 && headings.length > 0) {
-      headings[headings.length - 1].children.push({
-        level: 3,
-        text: h3[1].replace(/[#*`]/g, '').trim(),
-      })
-    }
-  }
-  return headings
+// ── Parse only h2 headings for the sidebar TOC ────────────────────
+function parseH2Headings(md) {
+  return md
+    .split('\n')
+    .filter(line => /^##\s+/.test(line) && !/^###/.test(line))
+    .map(line => line.replace(/^##\s+/, '').replace(/[#*`]/g, '').trim())
 }
 
 export default function GuideViewer({ basePath }) {
-  const [guides, setGuides] = useState([])
+  const [guides, setGuides]         = useState([])
   const [activeGuide, setActiveGuide] = useState(null)
-  const [markdown, setMarkdown] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [markdown, setMarkdown]     = useState('')
+  const [loading, setLoading]       = useState(true)
+  const [error, setError]           = useState(null)
   const [activeHeading, setActiveHeading] = useState(null)
 
   // Load notes manifest
@@ -69,14 +64,14 @@ export default function GuideViewer({ basePath }) {
       })
   }, [activeGuide, basePath])
 
-  // Track scroll position to highlight active heading
+  // Highlight active heading on scroll
   useEffect(() => {
     if (!markdown) return
     const handleScroll = () => {
-      const headingEls = document.querySelectorAll('.guide-markdown h2, .guide-markdown h3')
+      const els = document.querySelectorAll('.guide-markdown h2')
       let current = null
-      headingEls.forEach(el => {
-        if (el.getBoundingClientRect().top <= 100) current = el.id
+      els.forEach(el => {
+        if (el.getBoundingClientRect().top <= 110) current = el.id
       })
       setActiveHeading(current)
     }
@@ -84,11 +79,20 @@ export default function GuideViewer({ basePath }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [markdown])
 
-  const headings = useMemo(() => parseHeadings(markdown), [markdown])
+  // Intercept internal anchor clicks → smooth scroll instead of URL jump
+  const handleContentClick = (e) => {
+    const anchor = e.target.closest('a[href^="#"]')
+    if (!anchor) return
+    e.preventDefault()
+    const id = anchor.getAttribute('href').slice(1)
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const h2Headings = useMemo(() => parseH2Headings(markdown), [markdown])
 
   const scrollTo = (text) => {
-    const id = slugify(text)
-    const el = document.getElementById(id)
+    const el = document.getElementById(slugify(text))
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -104,9 +108,9 @@ export default function GuideViewer({ basePath }) {
     <div className="guides-layout">
       {/* Sidebar */}
       <aside className="guides-sidebar">
-        {/* Guide selector (if multiple guides exist) */}
+        {/* Guide selector — only if multiple guides */}
         {guides.length > 1 && (
-          <div className="guides-selector">
+          <>
             <div className="guides-sidebar-header">
               <span className="guides-sidebar-icon">📚</span>
               <span className="guides-sidebar-title">Study Guides</span>
@@ -125,10 +129,10 @@ export default function GuideViewer({ basePath }) {
               ))}
             </ul>
             <div className="guides-toc-divider" />
-          </div>
+          </>
         )}
 
-        {/* Single guide header when only one */}
+        {/* Single guide header */}
         {guides.length === 1 && activeGuide && (
           <div className="guides-sidebar-header">
             <span className="guides-sidebar-icon">❄️</span>
@@ -136,33 +140,18 @@ export default function GuideViewer({ basePath }) {
           </div>
         )}
 
-        {/* Hierarchical TOC */}
-        {!loading && headings.length > 0 && (
+        {/* TOC — h2 topics only */}
+        {!loading && h2Headings.length > 0 && (
           <nav className="guide-toc" aria-label="Table of contents">
             <ul className="guide-toc-list">
-              {headings.map((h2, i) => (
+              {h2Headings.map((text, i) => (
                 <li key={i} className="guide-toc-h2-item">
                   <button
-                    className={`guide-toc-btn guide-toc-h2${activeHeading === slugify(h2.text) ? ' toc-active' : ''}`}
-                    onClick={() => scrollTo(h2.text)}
+                    className={`guide-toc-btn guide-toc-h2${activeHeading === slugify(text) ? ' toc-active' : ''}`}
+                    onClick={() => scrollTo(text)}
                   >
-                    {h2.text}
+                    {text}
                   </button>
-                  {h2.children.length > 0 && (
-                    <ul className="guide-toc-sub">
-                      {h2.children.map((h3, j) => (
-                        <li key={j}>
-                          <button
-                            className={`guide-toc-btn guide-toc-h3${activeHeading === slugify(h3.text) ? ' toc-active' : ''}`}
-                            onClick={() => scrollTo(h3.text)}
-                          >
-                            <span className="toc-h3-dot" />
-                            {h3.text}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </li>
               ))}
             </ul>
@@ -180,6 +169,7 @@ export default function GuideViewer({ basePath }) {
         ) : (
           <article
             className="guide-markdown"
+            onClick={handleContentClick}
             dangerouslySetInnerHTML={{ __html: marked.parse(markdown) }}
           />
         )}
