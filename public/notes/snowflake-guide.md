@@ -7,32 +7,32 @@
 
 ## 📚 Chapters
 
-- **[Chapter 1: Architecture & Core Concepts](#chapter-1-architecture--core-concepts)**
+- **[Chapter 1: Architecture & Core Concepts](#chapter-1-architecture-core-concepts)**
   - [1.1 What is Snowflake?](#11-what-is-snowflake)
   - [1.2 Three-Layer Architecture](#12-three-layer-architecture)
-  - [1.3 Columnar Storage & Micro-partitions](#13-columnar-storage--micro-partitions)
+  - [1.3 Columnar Storage & Micro-partitions](#13-columnar-storage-micro-partitions)
   - [1.4 Caching](#14-caching)
   - [1.5 Virtual Warehouses](#15-virtual-warehouses)
   - [1.6 Query Execution Flow](#16-query-execution-flow)
 - **[Chapter 2: Enterprise Data Modeling](#chapter-2-enterprise-data-modeling)**
   - [2.1 OLTP vs OLAP](#21-oltp-vs-olap)
-  - [2.2 Data Modeling — Star & Snowflake Schema](#22-data-modeling--star--snowflake-schema)
+  - [2.2 Data Modeling — Star & Snowflake Schema](#22-data-modeling-star-snowflake-schema)
   - [2.3 Fact vs Dimension](#23-fact-vs-dimension)
-  - [2.4 Constraints, Views & Dynamic Tables](#24-constraints-views--dynamic-tables)
-- **[Chapter 3: Semi-Structured Data & Ingestion](#chapter-3-semi-structured-data--ingestion)**
-  - [3.1 Semi-Structured Data — VARIANT](#31-semi-structured-data--variant)
+  - [2.4 Constraints, Views & Dynamic Tables](#24-constraints-views-dynamic-tables)
+- **[Chapter 3: Semi-Structured Data & Ingestion](#chapter-3-semi-structured-data-ingestion)**
+  - [3.1 Semi-Structured Data — VARIANT](#31-semi-structured-data-variant)
   - [3.2 JSON Functions](#32-json-functions)
-  - [3.3 Stages & COPY INTO](#33-stages--copy-into)
-  - [3.4 Advanced COPY INTO & Ingestion Metadata](#34-advanced-copy-into--ingestion-metadata)
+  - [3.3 Stages & COPY INTO](#33-stages-copy-into)
+  - [3.4 Advanced COPY INTO & Ingestion Metadata](#34-advanced-copy-into-ingestion-metadata)
 - **[Chapter 4: Enterprise Data Ingestion Pipelines](#chapter-4-enterprise-data-ingestion-pipelines)**
   - [4.1 Multi-Layer Pipeline Architecture](#41-multi-layer-pipeline-architecture)
-  - [4.2 Data Validation & Error Logging](#42-data-validation--error-logging)
-  - [4.3 Incremental Loading & MERGE (UPSERT)](#43-incremental-loading--merge-upsert)
-  - [4.4 RAW vs CURATED Design (Lineage & Replay)](#44-raw-vs-curated-design-lineage--replay)
-  - [4.5 Pipeline Best Practices & AI Readiness](#45-pipeline-best-practices--ai-readiness)
-- **[Chapter 5: Practice & Interview Prep](#chapter-5-practice--interview-prep)**
+  - [4.2 Data Validation & Error Logging](#42-data-validation-error-logging)
+  - [4.3 Incremental Loading & MERGE (UPSERT)](#43-incremental-loading-merge-upsert)
+  - [4.4 RAW vs CURATED Design (Lineage & Replay)](#44-raw-vs-curated-design-lineage-replay)
+  - [4.5 Pipeline Best Practices & AI Readiness](#45-pipeline-best-practices-ai-readiness)
+- **[Chapter 5: Practice & Interview Prep](#chapter-5-practice-interview-prep)**
   - [5.1 Key Interview Questions](#51-key-interview-questions)
-  - [5.2 Quick Tips & Gotchas](#52-quick-tips--gotchas)
+  - [5.2 Quick Tips & Gotchas](#52-quick-tips-gotchas)
 
 ---
 

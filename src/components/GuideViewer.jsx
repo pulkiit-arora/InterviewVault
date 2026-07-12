@@ -9,6 +9,7 @@ function slugify(text) {
     .replace(/[^\w\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
+    .replace(/-+/g, '-') // Collapse multiple hyphens
 }
 
 // ── Custom renderer: adds id= to every heading ────────────────────
@@ -55,6 +56,21 @@ export default function GuideViewer({ basePath }) {
         setLoading(false)
       })
   }, [activeGuide, basePath])
+
+  // Auto-scroll to hash on initial load once markdown rendering is complete
+  useEffect(() => {
+    if (loading || !markdown) return
+    const hash = window.location.hash
+    if (hash) {
+      const id = decodeURIComponent(hash.slice(1))
+      setTimeout(() => {
+        const el = document.getElementById(id)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 150)
+    }
+  }, [loading, markdown])
 
   // Intercept internal anchor clicks → smooth scroll instead of URL jump
   const handleContentClick = (e) => {
