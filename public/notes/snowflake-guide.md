@@ -5,26 +5,33 @@
 
 ---
 
-## 📚 Topics Covered
+## 📚 Chapters
 
-1. [What is Snowflake?](#1-what-is-snowflake)
-2. [Three-Layer Architecture](#2-three-layer-architecture)
-3. [Columnar Storage & Micro-partitions](#3-columnar-storage--micro-partitions)
-4. [Caching](#4-caching)
-5. [Virtual Warehouses](#5-virtual-warehouses)
-6. [Query Execution Flow](#6-query-execution-flow)
-7. [OLTP vs OLAP](#7-oltp-vs-olap)
-8. [Data Modeling — Star & Snowflake Schema](#8-data-modeling--star--snowflake-schema)
-9. [Fact vs Dimension](#9-fact-vs-dimension)
-10. [Constraints, Views & Dynamic Tables](#10-constraints-views--dynamic-tables)
-11. [Semi-Structured Data — VARIANT](#11-semi-structured-data--variant)
-12. [JSON Functions](#12-json-functions)
-13. [Stages & COPY INTO](#13-stages--copy-into)
-14. [Key Interview Questions](#14-key-interview-questions)
+- **[Chapter 1: Architecture & Core Concepts](#chapter-1-architecture--core-concepts)**
+  - [1.1 What is Snowflake?](#11-what-is-snowflake)
+  - [1.2 Three-Layer Architecture](#12-three-layer-architecture)
+  - [1.3 Columnar Storage & Micro-partitions](#13-columnar-storage--micro-partitions)
+  - [1.4 Caching](#14-caching)
+  - [1.5 Virtual Warehouses](#15-virtual-warehouses)
+  - [1.6 Query Execution Flow](#16-query-execution-flow)
+- **[Chapter 2: Enterprise Data Modeling](#chapter-2-enterprise-data-modeling)**
+  - [2.1 OLTP vs OLAP](#21-oltp-vs-olap)
+  - [2.2 Data Modeling — Star & Snowflake Schema](#22-data-modeling--star--snowflake-schema)
+  - [2.3 Fact vs Dimension](#23-fact-vs-dimension)
+  - [2.4 Constraints, Views & Dynamic Tables](#24-constraints-views--dynamic-tables)
+- **[Chapter 3: Semi-Structured Data & Ingestion](#chapter-3-semi-structured-data--ingestion)**
+  - [3.1 Semi-Structured Data — VARIANT](#31-semi-structured-data--variant)
+  - [3.2 JSON Functions](#32-json-functions)
+  - [3.3 Stages & COPY INTO](#33-stages--copy-into)
+- **[Chapter 4: Practice & Interview Prep](#chapter-4-practice--interview-prep)**
+  - [4.1 Key Interview Questions](#41-key-interview-questions)
+  - [4.2 Quick Tips & Gotchas](#42-quick-tips--gotchas)
 
 ---
 
-## 1. What is Snowflake?
+## Chapter 1: Architecture & Core Concepts
+
+### 1.1 What is Snowflake?
 
 **Snowflake** is a cloud-native **Data + AI Platform** that separates storage and compute.
 
@@ -33,7 +40,7 @@
 
 ---
 
-## 2. Three-Layer Architecture
+### 1.2 Three-Layer Architecture
 
 ```
 Applications
@@ -55,7 +62,7 @@ Storage Layer          ← Memory
 
 ---
 
-## 3. Columnar Storage & Micro-partitions
+### 1.3 Columnar Storage & Micro-partitions
 
 **Columnar Storage** — data stored column-by-column, not row-by-row.
 
@@ -77,7 +84,7 @@ Result: Less I/O → Faster queries. **This replaces the need for indexes.**
 
 ---
 
-## 4. Caching
+### 1.4 Caching
 
 | Cache | What it stores | Lost when? |
 |-------|----------------|------------|
@@ -89,7 +96,7 @@ Result: Less I/O → Faster queries. **This replaces the need for indexes.**
 
 ---
 
-## 5. Virtual Warehouses
+### 1.5 Virtual Warehouses
 
 - **Purpose:** Compute only (not storage)
 - **Key Features:** Auto Suspend, Auto Resume, Resize, Multi-cluster, Workload Isolation
@@ -98,7 +105,7 @@ Result: Less I/O → Faster queries. **This replaces the need for indexes.**
 
 ---
 
-## 6. Query Execution Flow
+### 1.6 Query Execution Flow
 
 ```
 User → SQL Worksheet → Cloud Services
@@ -108,7 +115,9 @@ User → SQL Worksheet → Cloud Services
 
 ---
 
-## 7. OLTP vs OLAP
+## Chapter 2: Enterprise Data Modeling
+
+### 2.1 OLTP vs OLAP
 
 | | OLTP | OLAP |
 |--|------|------|
@@ -121,7 +130,7 @@ User → SQL Worksheet → Cloud Services
 
 ---
 
-## 8. Data Modeling — Star & Snowflake Schema
+### 2.2 Data Modeling — Star & Snowflake Schema
 
 **Enterprise Schema Pattern** (instead of one HR schema):
 
@@ -147,7 +156,7 @@ Country → Location → Department → Employee
 
 ---
 
-## 9. Fact vs Dimension
+### 2.3 Fact vs Dimension
 
 | | Dimension | Fact |
 |--|-----------|------|
@@ -157,7 +166,7 @@ Country → Location → Department → Employee
 
 ---
 
-## 10. Constraints, Views & Dynamic Tables
+### 2.4 Constraints, Views & Dynamic Tables
 
 **Constraints (PK / FK)**
 - Snowflake supports them **but does NOT enforce** them on standard tables
@@ -173,7 +182,9 @@ Country → Location → Department → Employee
 
 ---
 
-## 11. Semi-Structured Data — VARIANT
+## Chapter 3: Semi-Structured Data & Ingestion
+
+### 3.1 Semi-Structured Data — VARIANT
 
 `VARIANT` can store: **JSON, Avro, ORC, Parquet, XML**
 
@@ -194,7 +205,7 @@ EMPLOYEE table
 
 ---
 
-## 12. JSON Functions
+### 3.2 JSON Functions
 
 | Function | Purpose | Quick Example |
 |----------|---------|---------------|
@@ -214,7 +225,7 @@ LATERAL FLATTEN(input => e.profile:skills) f;
 
 ---
 
-## 13. Stages & COPY INTO
+### 3.3 Stages & COPY INTO
 
 **Stages** — Temporary holding area for files before loading.
 
@@ -234,7 +245,9 @@ FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1);
 
 ---
 
-## 14. Key Interview Questions
+## Chapter 4: Practice & Interview Prep
+
+### 4.1 Key Interview Questions
 
 - What is Snowflake? Why is it called a Data + AI Platform?
 - Why separate Storage and Compute?
@@ -255,7 +268,7 @@ FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1);
 
 ---
 
-## 🗒️ Quick Tips & Gotchas
+### 4.2 Quick Tips & Gotchas
 
 - `VARIANT` accepts nested/dynamic JSON but **always cast before operations**: `profile:age::INT`
 - Result Cache is per **query text** — even a space difference = cache miss
