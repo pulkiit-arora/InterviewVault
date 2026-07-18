@@ -86,10 +86,23 @@
   <!-- Chapter 7 -->
   <div class="chapter-card">
     <div class="chapter-num">Chapter 7</div>
-    <h3 class="chapter-name"><a href="#chapter-7-practice-interview-prep">Practice & Interview Prep</a></h3>
+    <h3 class="chapter-name"><a href="#chapter-7-security-access-control-rbac">Security & Access Control (RBAC)</a></h3>
     <ul class="chapter-topics">
-      <li><a href="#71-key-interview-questions">7.1 Key Interview Questions</a></li>
-      <li><a href="#72-quick-tips-gotchas">7.2 Ingestion Tips & Gotchas</a></li>
+      <li><a href="#71-authentication-vs-authorization">7.1 Authentication vs Authorization</a></li>
+      <li><a href="#72-roles-and-securable-objects">7.2 Roles & Securable Objects</a></li>
+      <li><a href="#73-snowflake-system-roles">7.3 System Roles Hierarchy</a></li>
+      <li><a href="#74-rbac-best-practices">7.4 RBAC Best Practices</a></li>
+      <li><a href="#75-advanced-data-security-masking-row-access">7.5 Advanced Data Security</a></li>
+    </ul>
+  </div>
+
+  <!-- Chapter 8 -->
+  <div class="chapter-card">
+    <div class="chapter-num">Chapter 8</div>
+    <h3 class="chapter-name"><a href="#chapter-8-practice-interview-prep">Practice & Interview Prep</a></h3>
+    <ul class="chapter-topics">
+      <li><a href="#81-key-interview-questions">8.1 Key Interview Questions</a></li>
+      <li><a href="#82-quick-tips-gotchas">8.2 Ingestion Tips & Gotchas</a></li>
     </ul>
   </div>
 </div>
@@ -536,9 +549,79 @@ CREATE TABLE employee_recover_table
 
 ---
 
-## Chapter 7: Practice & Interview Prep
+## Chapter 7: Security & Access Control (RBAC)
 
-### 7.1 Key Interview Questions
+### 7.1 Authentication vs Authorization
+
+- **Authentication (AuthN):** Verifying *who* you are (Identity). Snowflake supports:
+  - Username/Password
+  - Multi-Factor Authentication (MFA) via Duo
+  - Federated Authentication / SSO (SAML 2.0, Okta, Azure AD)
+  - Key Pair Authentication (OAuth / JWT for programmatic access)
+- **Authorization (AuthZ):** Verifying *what* you can do (Access). Handled exclusively through **Role-Based Access Control (RBAC)**.
+
+---
+
+### 7.2 Roles & Securable Objects
+
+- **Securable Objects:** Any entity in Snowflake (Database, Schema, Table, Warehouse). Each object is owned by exactly one role.
+- **Object Ownership:** The role that creates an object automatically becomes its owner. The owner has all privileges on the object, including the ability to drop it or grant access to other roles. Ownership can be transferred using `GRANT OWNERSHIP`.
+- **Privileges:** Permissions granted on an object (e.g., `SELECT` on a table, `USAGE` on a warehouse).
+- **Roles:** The entity to which privileges are granted. **Users are not granted privileges directly.** Users are granted roles, and roles are granted privileges.
+
+**Basic RBAC Grant Syntax:**
+```sql
+-- Grant a privilege on an object to a role
+GRANT SELECT ON TABLE my_table TO ROLE analyst_role;
+
+-- Grant with the ability for the recipient to grant it to others
+GRANT SELECT ON TABLE my_table TO ROLE senior_analyst_role WITH GRANT OPTION;
+
+-- Grant a role to another role (creates hierarchy)
+GRANT ROLE analyst_role TO ROLE sysadmin;
+
+-- Grant a role to a user
+GRANT ROLE analyst_role TO USER john_doe;
+```
+
+---
+
+### 7.3 System Roles Hierarchy
+
+Snowflake provides standard system-defined roles. **Custom roles should inherit from these to form a hierarchy.**
+
+- **ACCOUNTADMIN:** The top-level role. Has all privileges of SYSADMIN and SECURITYADMIN. Used for billing, account-level configs, and integrations. *Should be used sparingly.*
+- **SECURITYADMIN:** Manages security across the account (creates users, roles, and grants). Includes all privileges of USERADMIN.
+- **USERADMIN:** Specifically manages user and role creation (only for objects it created).
+- **SYSADMIN:** The master role for all custom database and warehouse objects. **All custom roles should ultimately roll up to SYSADMIN** so that SYSADMIN can manage all tables/schemas.
+- **PUBLIC:** A default role granted to every user. Used for shared public datasets.
+
+---
+
+### 7.4 RBAC Best Practices
+
+1. **Never grant privileges directly to users.** Always grant privileges to roles, and assign users to roles.
+2. **Use Role Hierarchies:** Create "Access Roles" (e.g., `READ_SALES_TABLE`) and grant them to "Functional Roles" (e.g., `DATA_ANALYST`).
+3. **SYSADMIN Roll-up:** Always grant custom functional roles to `SYSADMIN` so DBAs can maintain objects created by custom roles.
+4. **MFA Enforced:** Always enforce MFA for users holding the `ACCOUNTADMIN` role.
+5. **Future Grants:** Use `GRANT ... ON FUTURE TABLES IN SCHEMA ...` to automatically apply permissions to tables created later.
+
+---
+
+### 7.5 Advanced Data Security (Masking & Row Access)
+
+- **Dynamic Data Masking (Column-Level Security):** Allows you to hide sensitive data (PII, PHI) in a column based on the querying user's role, without physically altering the stored data.
+  - *Example:* A `DATA_ANALYST` sees `XXX-XX-1234` for a SSN, while `HR_ADMIN` sees the full `123-45-1234`.
+  - Created via `CREATE MASKING POLICY` and applied to columns.
+- **Row Access Policies (Row-Level Security):** Restricts which rows a user can see in a table based on their role or session context.
+  - *Example:* A regional sales manager can only `SELECT` rows where `region = 'EU'`.
+  - Created via `CREATE ROW ACCESS POLICY` and applied to a table.
+
+---
+
+## Chapter 8: Practice & Interview Prep
+
+### 8.1 Key Interview Questions
 
 - **What is a Stage?** Explain the differences between User, Table, Named, and External stages.
 - **Why is COPY INTO faster than INSERT?** `COPY INTO` bulk loads files using parallel compute threads from the warehouse directly, while `INSERT` processes statement-by-statement through the Cloud Services optimizer.
@@ -562,7 +645,7 @@ CREATE TABLE employee_recover_table
 
 ---
 
-### 7.2 Quick Tips & Gotchas
+### 8.2 Quick Tips & Gotchas
 
 - `COPY INTO` is idempotent (files already loaded successfully are skipped unless `FORCE = TRUE` is passed).
 - If your files have duplicate keys inside a single load batch, `MERGE` will fail with a "multiple updates to same target row" error. Always deduplicate source files in RAW/CLEAN before running a `MERGE` target statement.
