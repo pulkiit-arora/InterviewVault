@@ -4,7 +4,15 @@
       "id": "snowflake",
       "title": "❄️ Snowflake",
       "subtitle": "Architecture, Modeling & Semi-Structured Data",
-      "file": "snowflake-guide.md"
+      "file": "snowflake-guide.md",
+      "category": "tech"
+    },
+    {
+      "id": "soft-skills",
+      "title": "🤝 Soft Skills",
+      "subtitle": "Communication, Leadership & Teamwork",
+      "file": "soft-skills-guide.md",
+      "category": "soft"
     }
   ]
 }

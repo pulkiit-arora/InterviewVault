@@ -96,8 +96,24 @@ export default function GuideViewer({ basePath }) {
           <span className="guides-sidebar-icon">📚</span>
           <span className="guides-sidebar-title">Study Guides</span>
         </div>
+        <div className="guides-category-title">Tech</div>
         <ul className="guides-list">
-          {guides.map(g => (
+          {guides.filter(g => g.category === 'tech' || !g.category).map(g => (
+            <li key={g.id}>
+              <button
+                className={`guide-item-btn${activeGuide?.id === g.id ? ' active' : ''}`}
+                onClick={() => setActiveGuide(g)}
+              >
+                <span className="guide-item-title">{g.title}</span>
+                {g.subtitle && <span className="guide-item-sub">{g.subtitle}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div className="guides-category-title">Soft Skills</div>
+        <ul className="guides-list">
+          {guides.filter(g => g.category === 'soft').map(g => (
             <li key={g.id}>
               <button
                 className={`guide-item-btn${activeGuide?.id === g.id ? ' active' : ''}`}
