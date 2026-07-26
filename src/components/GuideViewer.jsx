@@ -23,6 +23,7 @@ marked.use({ renderer, breaks: true, gfm: true })
 export default function GuideViewer({ basePath }) {
   const [guides, setGuides]           = useState([])
   const [activeGuide, setActiveGuide] = useState(null)
+  const [activeTab, setActiveTab]     = useState('tech')
   const [markdown, setMarkdown]       = useState('')
   const [loading, setLoading]         = useState(true)
   const [error, setError]             = useState(null)
@@ -43,6 +44,11 @@ export default function GuideViewer({ basePath }) {
     if (!activeGuide) return
     setLoading(true)
     setMarkdown('')
+    
+    // Auto-switch tab if the newly selected guide belongs to another tab (e.g. on first load)
+    const isTech = activeGuide.category === 'tech' || !activeGuide.category
+    setActiveTab(isTech ? 'tech' : 'soft')
+
     fetch(`${basePath}notes/${activeGuide.file}`)
       .then(r => r.text())
       .then(text => {
@@ -88,6 +94,10 @@ export default function GuideViewer({ basePath }) {
     )
   }
 
+  const displayedGuides = guides.filter(g => 
+    activeTab === 'tech' ? (g.category === 'tech' || !g.category) : g.category === 'soft'
+  )
+
   return (
     <div className="guides-layout">
       {/* Sidebar — guide list only */}
@@ -96,24 +106,24 @@ export default function GuideViewer({ basePath }) {
           <span className="guides-sidebar-icon">📚</span>
           <span className="guides-sidebar-title">Study Guides</span>
         </div>
-        <div className="guides-category-title">Tech</div>
-        <ul className="guides-list">
-          {guides.filter(g => g.category === 'tech' || !g.category).map(g => (
-            <li key={g.id}>
-              <button
-                className={`guide-item-btn${activeGuide?.id === g.id ? ' active' : ''}`}
-                onClick={() => setActiveGuide(g)}
-              >
-                <span className="guide-item-title">{g.title}</span>
-                {g.subtitle && <span className="guide-item-sub">{g.subtitle}</span>}
-              </button>
-            </li>
-          ))}
-        </ul>
 
-        <div className="guides-category-title">Soft Skills</div>
+        <div className="guides-tabs">
+          <button 
+            className={`guides-tab-btn ${activeTab === 'tech' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tech')}
+          >
+            Tech
+          </button>
+          <button 
+            className={`guides-tab-btn ${activeTab === 'soft' ? 'active' : ''}`}
+            onClick={() => setActiveTab('soft')}
+          >
+            Soft Skills
+          </button>
+        </div>
+
         <ul className="guides-list">
-          {guides.filter(g => g.category === 'soft').map(g => (
+          {displayedGuides.map(g => (
             <li key={g.id}>
               <button
                 className={`guide-item-btn${activeGuide?.id === g.id ? ' active' : ''}`}
